@@ -1,0 +1,31 @@
+#
+# Copyright (c) 2015, PLUMgrid Inc, http://plumgrid.com
+#
+
+- name: Create nova ifc_ctl_sudoers file
+  lineinfile:
+    dest: /etc/sudoers.d/ifc_ctl_sudoers
+    line: "nova ALL=(root) NOPASSWD: /opt/pg/bin/ifc_ctl_pp *"
+    state: present
+    create: yes
+    owner: root
+    mode: "644"
+
+- name: Update qemu settings for compute hosts
+  template:
+    src: qemu.conf
+    dest: /etc/libvirt/qemu.conf
+
+- name: Restart libvirt-bin
+  service:
+    name: libvirt-bin
+    state: restarted
+    pattern: libvirt-bin
+
+- name: Check PLUMgrid services
+  shell: >
+    virsh -c lxc: lxc-enter-namespace plumgrid --noseclabel -- /usr/bin/service {{ pg_service_name }} status
+  register: pg_lxc_check
+
+- fail: msg= "Fail on non-running services"
+  when: pg_lxc_check.stdout.find('start/running') == -1

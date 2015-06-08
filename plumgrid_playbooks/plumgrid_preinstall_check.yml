@@ -1,0 +1,31 @@
+#
+# Copyright (c) 2015, PLUMgrid Inc, http://plumgrid.com
+#
+
+# Pre-installation checks for PLUMgrid installation
+- hosts: 127.0.0.1
+  connection: local
+  tasks:
+    # Check for existing License file
+    - name: Checking for License file existence
+      stat:
+        path: "{{ pg_license_path }}"
+      register: lic_present
+    - fail: msg= "Fail on non-existing PLUMgrid License file"
+      when: install_license == True and (lic_present.stat.exists == False or lic_present.stat.size == 0)
+    - name: add Gateways to new host_group
+      add_host: name={{item.hostname}} group=gateway_hosts
+      with_items: gateway_hosts
+
+- name: Check Pre-Install Requirements
+  hosts: infra_hosts
+  user: root
+  tasks:    
+    - name: Check if plumgrid is installed
+      command: dpkg-query -l plumgrid-lxc
+      register: deb_check
+      ignore_errors: yes
+    - name: Check that plumgrid designated ports are free      
+      wait_for: port={{item.value.port_num}} state=absent timeout=10
+      with_dict: pg_ports
+      when: deb_check.stdout.find('no packages found') != -1

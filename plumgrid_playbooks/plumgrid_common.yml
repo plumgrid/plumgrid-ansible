@@ -1,0 +1,41 @@
+#
+# Copyright (c) 2015, PLUMgrid Inc, http://plumgrid.com
+#
+
+- hosts: infra_hosts
+  user: root
+  roles:
+    - plumgrid_common
+    - plumgrid_director
+  vars:
+    lcm_ssh_key: "{{ lookup('file', lvm_keypath_content) }}"
+    pg_service_name: plumgrid
+
+- hosts: compute_hosts
+  user: root
+  roles:
+    - plumgrid_common
+    - plumgrid_edge
+  vars:
+    lcm_ssh_key: "{{ lookup('file', lvm_keypath_content) }}"
+    pg_service_name: plumgrid-iovisor
+
+- hosts: gateway_hosts
+  user: root
+  roles:
+    - plumgrid_common
+    - plumgrid_gateway
+  vars:
+    lcm_ssh_key: "{{ lookup('file', lvm_keypath_content) }}"
+    pg_service_name: plumgrid-iovisor
+
+- hosts: nova_all
+  user: root
+  tasks:
+    - name: Add neutron url timeouts to nova.conf
+      lineinfile:
+        dest: /etc/nova/nova.conf
+        insertafter: '\[neutron\]'
+        line: "url_timeout=200"
+        state: present
+        create: yes

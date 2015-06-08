@@ -1,0 +1,17 @@
+#
+# Copyright (c) 2015, PLUMgrid Inc, http://plumgrid.com
+#
+
+- hosts: neutron_all
+  user: root
+  tasks:
+    - name: Ensure stopped neutron agent services
+      service: name={{ item }} state=stopped pattern={{ item }}
+      register: service_stopped
+      failed_when: "'msg' in service_stopped and 'FAIL' in service_stopped.msg|upper"
+      with_items: "{{ neutron_services|map(attribute='service_name')|list }}"
+
+- hosts: neutron_server
+  user: root
+  roles:
+    - plumgrid_neutron

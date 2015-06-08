@@ -1,67 +1,9 @@
----
-# Copyright 2015, PLUMgrid Inc.
 #
-# The variables used by the PLUMgrid playbooks
-# Replace all < > placeholders with appropiate values before beginning an installation
+# Copyright (c) 2015, PLUMgrid Inc, http://plumgrid.com
+#
 
-# Repo Link hosting PLUMgrid packages
-plumgrid_repo: <Repo Link>
-plumgrid_component: everest
+- include: plumgrid_preinstall_check.yml
 
-# PLUMgrid Zone configuration
-plumgrid_ip: <Infra IPs comma seperated>
-pg_vip: <Virtual IP>
-fabric_mode: host
+- include: plumgrid_neutron.yml
 
-# Default Fabric Interface
-fabric_interface: <ethX>
-
-# Overriding Fabric interface for these nodes
-fabric_ifc_override:
-  - { hostname: gateway1, fabric_ifc: eth1 }
-  - { hostname: computeN, fabric_ifc: eth3 }
-
-# Default Management Interface
-pg_management: br-mgmt
-
-# Overriding Management interface for these nodes
-mgmt_overide:
-  - { hostname: gateway1, mgmt_ifc: eth2 }
-
-hostname: "pg-{{ inventory_hostname }}"
-
-# Installation parameters
-gpg_keypath: /var/lib/plumgrid/GPG-KEY
-enable_pg_metadata: False
-install_license: True
-pg_license_path: /var/lib/plumgrid/pg_license
-
-pg_ports:
- - {port_name: vip_port, port_num: 443}
- - {port_name: postgres_port, port_num: 5432}
- - {port_name: log_collection_port, port_num: 12349}
- - {port_name: rest_port, port_num: 9180}
- - {port_name: plumgrid_port, port_num: 8001}
-
-# keepalived config
-keepalived_router_id: "{{ pg_vip.split('.')[3] }}"
-keepalived_priority: 100
-keepalived_password: keepaliv
-
-# nginx config
-nginx_virtual_ip: "{{ pg_vip }}"
-real1: "{{ plumgrid_ip.split(',')[0] }}"
-real2: "{{ plumgrid_ip.split(',')[1] }}"
-real3: "{{ plumgrid_ip.split(',')[2] }}"
-
-# Gateway Configuration
-gateway_hosts:
-  gateway1:
-    ip: <Gateway Management IP>
-
-# Gateway Hosts and their interfaces
-gateway_hosts:
-  - hostname: gateway1
-    gateway_devs:
-    - eth4
-    - eth3
+- include: plumgrid_common.yml

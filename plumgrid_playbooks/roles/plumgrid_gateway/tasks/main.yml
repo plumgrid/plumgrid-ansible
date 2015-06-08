@@ -1,0 +1,43 @@
+#
+# Copyright (c) 2015, PLUMgrid Inc, http://plumgrid.com
+#
+
+- name: Checking for ifcs file existence
+  stat:
+    path: "/var/lib/libvirt/filesystems/plumgrid/var/run/plumgrid/lxc/ifc_list_gateway"
+  register: ifcs_present
+
+- name: Run Gateway Interface Checks
+  include: update_gateway.yml
+  when: inventory_hostname in groups['gateway_hosts'] and (ifcs_present.stat.exists == True or ifcs_present.stat.size != 0)
+  ignore_errors: true
+
+- name: Add Gateway dev interfaces
+  lineinfile:
+    dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf"
+    line: "{{ item.1 }} = access_phys"
+  with_subelements:
+      - gateway_hosts
+      - gateway_devs
+  when: inventory_hostname == "{{item.0.hostname}}"
+
+- name: Ensure no nova services on Gateways
+  service:
+    name: nova-compute
+    state: stopped
+    pattern: nova-compute
+  register: service_stopped
+  failed_when: "'msg' in service_stopped and 'FAIL' in service_stopped.msg|upper"
+
+- name: Restart PLUMgrid services
+  service:
+    name: plumgrid
+    state: restarted
+
+- name: Check PLUMgrid services
+  shell: >
+    virsh -c lxc: lxc-enter-namespace plumgrid --noseclabel -- /usr/bin/service {{ pg_service_name }} status
+  register: pg_lxc_check
+
+- fail: msg= "Fail on non-running services"
+  when: pg_lxc_check.stdout.find('start/running') == -1

@@ -1,0 +1,30 @@
+#
+# Copyright (c) 2015, PLUMgrid Inc, http://plumgrid.com
+#
+
+- name: Insert gateway ifc update script
+  template:
+    src: update_gw_ifc.sh
+    dest: ~/update_gw_ifc.sh
+
+- name: Extract all currently defined Gateway interfaces
+  shell: >
+   grep "access_phys" /var/lib/libvirt/filesystems/plumgrid/var/run/plumgrid/lxc/ifc_list_gateway | cut -d ' ' -f1
+  register: current_gw_ifcs
+
+- debug: var=current_gw_ifcs.stdout_lines
+
+- name: Check & update removed gateway interfaces
+  command: sh ~/update_gw_ifc.sh -i {{ item[0] }} -u remove
+  with_nested:
+      - current_gw_ifcs.stdout_lines
+      - gateway_hosts
+  when: inventory_hostname == item[1].hostname and (item[0] not in item[1].gateway_devs)
+
+- name: Check & Onboard additional Gateway interfaces
+  command: sh ~/update_gw_ifc.sh -i {{ item.1 }} -u add
+  with_subelements:
+      - gateway_hosts
+      - gateway_devs
+  when: inventory_hostname == "{{item.0.hostname}}"
+
