@@ -1,4 +1,4 @@
-# PLUMgrid Playbooks for OpenStack
+PLUMgrid Playbooks for OpenStack
 ##########################################
 :date: 2015-06-12 09:00
 :tags: networking, openstack, cloud, ansible
