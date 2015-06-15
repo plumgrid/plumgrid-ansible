@@ -22,10 +22,16 @@
     state: restarted
     pattern: libvirt-bin
 
+- name: Restart PLUMgrid service
+  service:
+    name: plumgrid
+    state: restarted
+
 - name: Check PLUMgrid services
   shell: >
     virsh -c lxc: lxc-enter-namespace plumgrid --noseclabel -- /usr/bin/service {{ pg_service_name }} status
   register: pg_lxc_check
+  until: pg_lxc_check.stdout.find('start/running') == -1
+  retries: 3
+  delay: 5
 
-- fail: msg= "Fail on non-running services"
-  when: pg_lxc_check.stdout.find('start/running') == -1

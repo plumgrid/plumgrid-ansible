@@ -63,7 +63,7 @@
     dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/plumgrid.conf"
     replace: "mgmt_dev={{ item.mgmt_ifc }}"
     regexp: "mgmt_dev={{ pg_management }}"
-  with_items: mgmt_overide 
+  with_items: mgmt_overide
   when: inventory_hostname == "{{item.hostname}}"
 
 # Update hostname

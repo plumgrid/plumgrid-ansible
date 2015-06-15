@@ -38,11 +38,11 @@ if [ "$update_option" = "add" ]; then
         ifup=$(/opt/pg/bin/ifc_ctl gateway ifup $interface access_phys $mac)
         if [ -z "$ifup" ]; then
           echo $interface = access_phys >> /var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf
-          echo Successfully added $interface...... 
+          echo Successfully added $interface......
           exit 0
-        else 
-          echo $ifup 
-          exit 1 
+        else
+          echo $ifup
+          exit 1
         fi
       else
         echo $add_port
@@ -63,7 +63,7 @@ elif [ "$update_option" = "remove" ]; then
         sed -i "/$interface = access_phys/d' /var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf
         echo Successfully removed $interface......
         exit 0
-      else 
+      else
         echo $del_port
         exit 1
       fi

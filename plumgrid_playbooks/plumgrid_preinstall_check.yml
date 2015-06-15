@@ -20,12 +20,12 @@
 - name: Check Pre-Install Requirements
   hosts: infra_hosts
   user: root
-  tasks:    
+  tasks:
     - name: Check if plumgrid is installed
       command: dpkg-query -l plumgrid-lxc
       register: deb_check
       ignore_errors: yes
-    - name: Check that plumgrid designated ports are free      
+    - name: Check that plumgrid designated ports are free
       wait_for: port={{item.value.port_num}} state=absent timeout=10
       with_dict: pg_ports
       when: deb_check.stdout.find('no packages found') != -1
