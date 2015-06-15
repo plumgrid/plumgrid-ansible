@@ -39,7 +39,7 @@ pg_metadata_port: 8775
 gpg_keypath: /var/lib/plumgrid/GPG-KEY
 install_license: True
 pg_license_path: /var/lib/plumgrid/pg_license
-lvm_keypath_content: /var/lib/plumgrid/zones/walmart/id_rsa.pub
+#lvm_keypath_content: <path to lvm key>
 
 pg_ports:
  vip_port:

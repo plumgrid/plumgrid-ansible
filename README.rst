@@ -31,4 +31,16 @@ This set of playbooks integrate with the os-ansible-deployment project to deploy
       src: https://github.com/plumgrid/plumgrid-ansible
       version: master
 
+4. Create a user variables file, using the sample in ``etc/user_pg_vars.yml.example`` and place it in ``/etc/rpc_deploy/``
+
+5. Run the playbooks with:
+
+.. code-block:: yaml
+
+   openstack-ansible playbooks/plumgrid_playbooks/plumgrid_all.yml
+
+Notes
+-------
+
+Contact PLUMgrid for an Installation pack (including Full/Trial License, deployment documentation): info@plumgrid.com
 
