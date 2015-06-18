@@ -64,11 +64,6 @@ real1: "{{ plumgrid_ip.split(',')[0] }}"
 real2: "{{ plumgrid_ip.split(',')[1] }}"
 real3: "{{ plumgrid_ip.split(',')[2] }}"
 
-# Gateway Configuration
-gateway_hosts:
-  gateway1:
-    ip: <Gateway Management IP>
-
 # Gateway Hosts and their interfaces
 gateway_hosts:
   - hostname: gateway1

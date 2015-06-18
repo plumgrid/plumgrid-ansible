@@ -7,6 +7,18 @@ License
 -------
 Copyright 2015 PLUMgrid Inc.
 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
 Playbooks
 -------
 
@@ -22,18 +34,11 @@ This set of playbooks integrate with the os-ansible-deployment project to deploy
 
 2. Also in the same file, disable the installation of all neutron-agents in the ``neutron_services`` dictionary, by setting their ``service_en`` keys to ``false``
 
-3. The PLUMgrid playbooks can then be pulled into the main deployment repository by adding the following lines to ``ansible-role_requirements.yml``
-
-
-.. code-block:: yaml
-
-    - name: PLUMgrid
-      src: https://github.com/plumgrid/plumgrid-ansible
-      version: master
+3. The PLUMgrid playbooks can then be cloned into the ``../playbooks/`` directory.
 
 4. Create a user variables file, using the sample in ``etc/user_pg_vars.yml.example`` and place it in ``/etc/rpc_deploy/``
 
-5. Run the playbooks with:
+5. Run the playbooks with (do this after the neuton plays have completed):
 
 .. code-block:: yaml
 

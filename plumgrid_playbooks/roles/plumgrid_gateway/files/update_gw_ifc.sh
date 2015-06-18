@@ -64,7 +64,7 @@ if [ "$update_option" = "add" ]; then
         exit 1
       fi
     else
-      echo $interface does not exist! Please fix your zone_config.yml
+      echo $interface does not exist! Please fix your gateway input specification
       exit 1
     fi
   fi
@@ -75,7 +75,7 @@ elif [ "$update_option" = "remove" ]; then
     if [ -z "$ifdown" ]; then
       del_port=$(/opt/pg/bin/ifc_ctl gateway del_port $interface)
       if [ -z "$del_port" ]; then
-        sed -i "/$interface = access_phys/d' /var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf
+        sed -i "/$interface = access_phys/d" /var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf
         echo Successfully removed $interface......
         exit 0
       else
@@ -91,6 +91,6 @@ elif [ "$update_option" = "remove" ]; then
     exit 1
   fi
 else
-  echo "Unkown Update Option specified"
+  echo Unkown Update Option specified
   exit 1
 fi

@@ -25,9 +25,6 @@
       register: lic_present
     - fail: msg= "Fail on non-existing PLUMgrid License file"
       when: install_license == True and (lic_present.stat.exists == False or lic_present.stat.size == 0)
-    - name: add Gateways to new host_group
-      add_host: name={{item.hostname}} group=gateway_hosts
-      with_items: gateway_hosts
 
 - name: Check Pre-Install Requirements
   hosts: infra_hosts

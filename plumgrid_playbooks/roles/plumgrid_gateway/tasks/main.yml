@@ -16,13 +16,31 @@
 
 - name: Checking for ifcs file existence
   stat:
-    path: "/var/lib/libvirt/filesystems/plumgrid/var/run/plumgrid/lxc/ifc_list_gateway"
+    path: "/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf"
   register: ifcs_present
 
 - name: Run Gateway Interface Checks
   include: update_gateway.yml
-  when: inventory_hostname in groups['gateway_hosts'] and (ifcs_present.stat.exists == True or ifcs_present.stat.size != 0)
+  when: ifcs_present.stat.exists == True or ifcs_present.stat.size != 0
   ignore_errors: true
+
+# Ensuring idempotency for ifcs file changes
+- name: Removing any pre-existing pg ifcs.conf
+  file: path=/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf state=absent
+
+- name: Create ifcs file
+  lineinfile:
+    dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf"
+    line: "{{ fabric_interface }} = fabric_core host"
+    create: yes
+
+- name: Override Fabric iterface for node
+  replace:
+    dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf"
+    replace: "{{ item.fabric_ifc }} = fabric_core host"
+    regexp: "{{ fabric_interface }} = fabric_core host"
+  with_items: fabric_ifc_override
+  when: inventory_hostname == "{{item.hostname}}"
 
 - name: Add Gateway dev interfaces
   lineinfile:
@@ -31,7 +49,7 @@
   with_subelements:
       - gateway_hosts
       - gateway_devs
-  when: inventory_hostname == "{{item.0.hostname}}" and (ifcs_present.stat.exists == False or ifcs_present.stat.size == 0)
+  when: inventory_hostname == "{{item.0.hostname}}"
 
 - name: Ensure no nova services on Gateways
   service:

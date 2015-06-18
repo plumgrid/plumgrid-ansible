@@ -93,14 +93,17 @@
     regexp: "plumgrid"
 
 # Ensuring idempotency for ifcs file changes
+
 - name: Removing any pre-existing pg ifcs.conf
   file: path=/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf state=absent
+  when: inventory_hostname not in groups['gateway_hosts']
 
 - name: Create ifcs file
   lineinfile:
     dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf"
     line: "{{ fabric_interface }} = fabric_core host"
     create: yes
+  when: inventory_hostname not in groups['gateway_hosts']
 
 - name: Override Fabric iterface for node
   replace:
@@ -108,7 +111,7 @@
     replace: "{{ item.fabric_ifc }} = fabric_core host"
     regexp: "{{ fabric_interface }} = fabric_core host"
   with_items: fabric_ifc_override
-  when: inventory_hostname == "{{item.hostname}}"
+  when: inventory_hostname not in groups['gateway_hosts'] and inventory_hostname == "{{item.hostname}}"
 
 - name: Fail when empty or non-existent LCM key
   fail: >
