@@ -53,3 +53,12 @@
         line: "url_timeout=200"
         state: present
         create: yes
+
+- hosts: infra_hosts
+  user: root
+  tasks:
+    - name: Restart libvirt-bin
+      service:
+        name: libvirt-bin
+        state: restarted
+        pattern: libvirt-bin
