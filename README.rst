@@ -38,11 +38,11 @@ This set of playbooks integrate with the os-ansible-deployment project to deploy
 
 4. Create a user variables file, using the sample in ``etc/user_pg_vars.yml.example`` and place it in ``/etc/rpc_deploy/``
 
-5. Run the playbooks with (do this after the neuton plays have completed):
+5. Run the playbooks with (do this before the openstack-setup.yml playbook is run):
 
 .. code-block:: yaml
 
-   openstack-ansible playbooks/plumgrid_playbooks/plumgrid_all.yml
+   openstack-ansible playbooks/plumgrid-ansible/plumgrid_playbooks/plumgrid_all.yml
 
 Notes
 -------
