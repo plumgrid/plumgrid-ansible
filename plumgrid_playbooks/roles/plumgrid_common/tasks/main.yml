@@ -19,7 +19,7 @@
   file: path=/etc/apt/sources.list.d/plumgrid.list state=absent
 
 # Create a PLUMgrid sources.list
-- name: Create plumgrid sources.list
+- name: Create PLUMgrid sources.list
   lineinfile:
     dest: /etc/apt/sources.list.d/plumgrid.list
     line: "deb {{ plumgrid_repo }}/plumgrid plumgrid {{ plumgrid_component }}"
@@ -27,20 +27,20 @@
     create: yes
 
 # Create a PLUMgrid sources.list
-- name: Add plumgrid-images to repo
+- name: Add PLUMgrid-images to repo
   lineinfile:
     dest: /etc/apt/sources.list.d/plumgrid.list
     line: "deb {{ plumgrid_repo }}/plumgrid-images plumgrid {{ plumgrid_component }}"
     state: present
 
 # Copy GPG-key file to target nodes
-- name: Copy Plumgrid GPG-key file
+- name: Copy PLUMgrid GPG-key file
   template:
     src: "{{ gpg_keypath }}"
     dest: /tmp/GPG-KEY
 
 # Create GPG-key
-- name: Add Plumgrid GPG-key
+- name: Add PLUMgrid GPG-key
   apt_key:
     file: /tmp/GPG-KEY
     state: present
@@ -65,21 +65,20 @@
     force: yes
 
 # Set PLUMgrid config
-- name: Setup plumgrid Conf
+- name: Setup PLUMgrid Conf
   template:
     src: plumgrid.conf
     dest: /var/lib/libvirt/filesystems/plumgrid-data/conf/pg/plumgrid.conf
 
-- name: Override Management iterface for node
+- name: Override Management interface for node
   replace:
     dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/plumgrid.conf"
-    replace: "mgmt_dev={{ item.mgmt_ifc }}"
+    replace: "mgmt_dev={{ mgmt_override[inventory_hostname] }}"
     regexp: "mgmt_dev={{ pg_management }}"
-  with_items: mgmt_overide
-  when: inventory_hostname == "{{item.hostname}}"
+  when: mgmt_override is defined and inventory_hostname in mgmt_override
 
 # Update hostname
-- name: Update Plumgrid hostname
+- name: Update PLUMgrid hostname
   replace:
     dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/etc/hostname"
     replace: "pg-{{ inventory_hostname }}"
@@ -92,16 +91,12 @@
     replace: "pg-{{ inventory_hostname }}"
     regexp: "plumgrid"
 
-- name: Fail when empty or non-existent LCM key
-  fail: >
-    msg="Failing - LCM key file doesn't exist or is empty"
-  when: lcm_ssh_key == ""
-
 - name: Set the LCM SSH key in place
   lineinfile:
     dest: "/var/lib/libvirt/filesystems/plumgrid-data/root/.ssh/authorized_keys"
     line: "{{ lcm_ssh_key }}"
     create: yes
+  when: lcm_ssh_key != ""
 
 # Removing network-manager
 - name: Removing network-manager
@@ -110,3 +105,10 @@
     state: absent
     purge: yes
     force: yes
+
+- name: Check if network-manager is still present
+  shell: >
+     dpkg -s network-manager | grep Status
+  register: nm_check
+  failed_when: nm_check.stderr.find('is not installed') == -1
+  changed_when: false

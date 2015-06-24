@@ -21,7 +21,7 @@
 
 - name: Run Gateway Interface Checks
   include: update_gateway.yml
-  when: ifcs_present.stat.exists == True or ifcs_present.stat.size != 0
+  when: ifcs_present.stat.exists == True
   ignore_errors: true
 
 # Ensuring idempotency for ifcs file changes

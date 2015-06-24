@@ -23,8 +23,7 @@
       stat:
         path: "{{ pg_license_path }}"
       register: lic_present
-    - fail: msg= "Fail on non-existing PLUMgrid License file"
-      when: install_license == True and (lic_present.stat.exists == False or lic_present.stat.size == 0)
+      failed_when: install_license == True and (lic_present.stat.exists == False or lic_present.stat.size == 0)
 
 - name: Check Pre-Install Requirements
   hosts: infra_hosts

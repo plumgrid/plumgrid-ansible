@@ -1,6 +1,20 @@
 ---
-# Copyright 2015, PLUMgrid Inc.
 #
+# Copyright (c) 2015, PLUMgrid Inc, http://plumgrid.com
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
 # The variables used by the PLUMgrid playbooks
 # Replace all < > placeholders with appropiate values before beginning an installation
 
@@ -20,15 +34,15 @@ fabric_interface: <ethX>
 
 # Overriding Fabric interface for these nodes
 fabric_ifc_override:
-  - { hostname: gateway1, fabric_ifc: eth1 }
-  - { hostname: computeN, fabric_ifc: eth3 }
+  gateway1: eth1
+  computeN: eth3
 
 # Default Management Interface
 pg_management: br-mgmt
 
 # Overriding Management interface for these nodes
-mgmt_overide:
-  - { hostname: gateway1, mgmt_ifc: eth2 }
+mgmt_override:
+  gateway1: eth2
 
 hostname: "pg-{{ inventory_hostname }}"
 
