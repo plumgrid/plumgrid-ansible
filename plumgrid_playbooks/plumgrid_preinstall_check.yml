@@ -34,6 +34,6 @@
       register: deb_check
       ignore_errors: yes
     - name: Check that plumgrid designated ports are free
-      wait_for: port={{item.value.port_num}} state=absent timeout=10
+      wait_for: port={{ item.value }} state=absent timeout=10
       with_dict: pg_ports
       when: deb_check.stderr.find('no packages found') != -1

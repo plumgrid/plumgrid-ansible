@@ -56,16 +56,14 @@ pg_license_path: /var/lib/plumgrid/pg_license
 #lvm_keypath_content: <path to lvm key>
 
 pg_ports:
- vip_port:
-   port_num: 443
- postgres_port:
-   port_num: 5432
- log_collection_port:
-   port_num: 12349
- rest_port:
-   port_num: 9180
- plumgrid_port:
-   port_num: 8001
+  vip_port: 443
+  postgres_port: 5432
+  log_collection_port: 12349
+  rest_port: 9180
+  plumgrid_port: 8001
+  pgcli_port: 3000
+  http_redirect_port: 9080
+  pg_rsync_port: 2222
 
 # keepalived config
 keepalived_router_id: "{{ pg_vip.split('.')[3] }}"

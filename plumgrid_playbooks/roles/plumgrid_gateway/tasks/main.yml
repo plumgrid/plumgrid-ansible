@@ -34,7 +34,7 @@
     line: "{{ fabric_interface }} = fabric_core host"
     create: yes
 
-- name: Override Fabric iterface for node
+- name: Override Fabric interface for node
   replace:
     dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf"
     replace: "{{ item.fabric_ifc }} = fabric_core host"

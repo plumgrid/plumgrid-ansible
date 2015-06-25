@@ -12,6 +12,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# # (c) 2015, Javeria Khan <javeriak@plumgrid.com>
+
+# This script takes input for interface name and update option,
+# to add or remove it from the PLUMgrid platform.
+# This interface is compared to the ones alreay onboarded onto
+# the PLUMgrid platform and appropiate action is taken
+#
+# Usage: sh update_gw_ifc.sh -i eth0 -u add
+
 
 #!/bin/bash
 set -e

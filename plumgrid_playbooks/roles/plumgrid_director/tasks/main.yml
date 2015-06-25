@@ -48,6 +48,9 @@
   retries: 5
   delay: 10
 
+- fail: msg= "Check if Login successful"
+  when: install_license == True and inventory_hostname == groups['infra_hosts'][0] and login_status.stdout != '200'
+
 - name: Install PLUMgrid License
   shell: >
     curl -H "Accept: application/json" -H "Content-Type: application/json" https://{{ pg_vip }}/0/tenant_manager/license_key/key1 -k -X PUT -d '{"license": "{{pg_license}}"}' -i -b /tmp/cookie -k| grep HTTP | awk '{print $2}'
