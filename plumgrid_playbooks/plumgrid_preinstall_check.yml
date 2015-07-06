@@ -18,12 +18,17 @@
 - hosts: 127.0.0.1
   connection: local
   tasks:
-    # Check for existing License file
+    # Check for required Installation Files
     - name: Checking for License file existence
       stat:
         path: "{{ pg_license_path }}"
       register: lic_present
       failed_when: install_license == True and (lic_present.stat.exists == False or lic_present.stat.size == 0)
+    - name: Checking for LCM key file
+      stat:
+        path: "{{ lvm_keypath_content }}"
+      register: lcm_key_present
+      failed_when: lcm_enabled is defined and lcm_enabled == True and (lcm_key_present.stat.exists == False  or lcm_key_present.stat.size == 0)
 
 - name: Check Pre-Install Requirements
   hosts: infra_hosts

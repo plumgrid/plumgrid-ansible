@@ -34,13 +34,12 @@
     line: "{{ fabric_interface }} = fabric_core host"
     create: yes
 
-- name: Override Fabric interface for node
+- name: Override Fabric iterface for Gateway nodes
   replace:
     dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf"
-    replace: "{{ item.fabric_ifc }} = fabric_core host"
+    replace: "{{ fabric_ifc_override[inventory_hostname] }} = fabric_core host"
     regexp: "{{ fabric_interface }} = fabric_core host"
-  with_items: fabric_ifc_override
-  when: inventory_hostname == "{{item.hostname}}"
+  when: fabric_ifc_override is defined and inventory_hostname in fabric_ifc_override
 
 - name: Add Gateway dev interfaces
   lineinfile:
