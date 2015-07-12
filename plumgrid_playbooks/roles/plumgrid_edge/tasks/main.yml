@@ -14,6 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Install nova-api
+  apt:
+    name: nova-api-metadata
+    state: latest
+    force: yes
+
 - name: Create nova ifc_ctl_sudoers file
   lineinfile:
     dest: /etc/sudoers.d/ifc_ctl_sudoers
