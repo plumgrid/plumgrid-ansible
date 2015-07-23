@@ -39,29 +39,19 @@
   shell: >
     curl -H "Accept: application/json" -H "Content-Type: application/json" -k -X POST https://{{ pg_vip }}/0/login -d '{"userName":"plumgrid","password":"plumgrid"}' -c /tmp/cookie -i | grep HTTP | awk '{print $2}'
   when: install_license == True and inventory_hostname == groups['infra_hosts'][0]
-  ignore_errors: true
   register: login_status
   until: login_status.stdout == '200'
   retries: 8
   delay: 15
 
-- fail: msg= "Check if Login successful"
-  when: install_license == True and inventory_hostname == groups['infra_hosts'][0] and login_status.stdout != '200'
-  any_errors_fatal: True
-
 - name: Install PLUMgrid License
   shell: >
     curl -H "Accept: application/json" -H "Content-Type: application/json" https://{{ pg_vip }}/0/tenant_manager/license_key/key1 -k -X PUT -d '{"license": "{{pg_license}}"}' -i -b /tmp/cookie -k| grep HTTP | awk '{print $2}'
   when: install_license == True and inventory_hostname == groups['infra_hosts'][0]
-  ignore_errors: true
   register: license_put_status
   until: license_put_status.stdout == '200'
   retries: 5
   delay: 10
-
-- fail: msg= "Check if License posted correctly"
-  when: install_license == True and inventory_hostname == groups['infra_hosts'][0] and license_put_status.stdout != '200'
-  any_errors_fatal: True
 
 - name: Check PLUMgrid services
   shell: >

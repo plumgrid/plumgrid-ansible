@@ -23,6 +23,7 @@
   vars:
     lcm_ssh_key: "{{ lookup('file', lvm_keypath_content) }}"
     pg_service_name: plumgrid
+  any_errors_fatal: yes
 
 - hosts: compute_hosts
   user: root
@@ -43,16 +44,27 @@
     lcm_ssh_key: "{{ lookup('file', lvm_keypath_content) }}"
     pg_service_name: plumgrid-iovisor
 
-- hosts: nova_all
-  user: root
+- hosts: 127.0.0.1
+  connection: local
   tasks:
+    - name: Remove Metadata IP from nova conf
+      replace:
+        dest: /opt/os-ansible-deployment/rpc_deployment/roles/nova_common/templates/nova.conf
+        regexp: '^metadata_host'
+        replace: '#metadata_host'
     - name: Add neutron url timeouts to nova.conf
       lineinfile:
-        dest: /etc/nova/nova.conf
+        dest: /opt/os-ansible-deployment/rpc_deployment/roles/nova_common/templates/nova.conf
         insertafter: '\[neutron\]'
-        line: "url_timeout=200"
+        line: "url_timeout = 200"
         state: present
         create: yes
+    - name: Enable metadata play on Edges
+      replace:
+        dest: /opt/os-ansible-deployment/rpc_deployment/playbooks/openstack/nova-api-metadata.yml
+        regexp: '^- hosts: nova_api_metadata'
+        replace: '- hosts: nova_api_metadata:compute_hosts'
+      when: enable_pg_metadata == True
 
 - hosts: infra_hosts
   user: root
