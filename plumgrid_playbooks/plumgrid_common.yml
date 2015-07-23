@@ -62,8 +62,8 @@
     - name: Enable metadata play on Edges
       replace:
         dest: /opt/os-ansible-deployment/rpc_deployment/playbooks/openstack/nova-api-metadata.yml
-        regexp: '^- hosts: nova_api_metadata'
-        replace: '- hosts: nova_api_metadata:compute_hosts'
+        regexp: 'nova_api_metadata$'
+        replace: 'nova_api_metadata:compute_hosts'
       when: enable_pg_metadata == True
 
 - hosts: infra_hosts
