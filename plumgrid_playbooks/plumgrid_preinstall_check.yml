@@ -29,6 +29,14 @@
         path: "{{ lvm_keypath_content }}"
       register: lcm_key_present
       failed_when: lcm_enabled is defined and lcm_enabled == True and (lcm_key_present.stat.exists == False  or lcm_key_present.stat.size == 0)
+    - name: Add plugin locking support playbook
+      lineinfile:
+        dest: /opt/os-ansible-deployment/rpc_deployment/playbooks/openstack/openstack-setup.yml
+        insertafter: '^- include: neutron-all.yml'
+        line: "- include: ../plumgrid-ansible/plumgrid_playbooks/post_plugin_install.yml"
+        state: present
+        create: yes
+
 
 - name: Check Pre-Install Requirements
   hosts: infra_hosts

@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright (c) 2015, PLUMgrid Inc, http://plumgrid.com
 #
@@ -21,7 +22,6 @@
 #
 # Usage: sh update_pg_ifc.sh -i eth0
 
-#!/bin/bash
 set -e
 
 usage() {

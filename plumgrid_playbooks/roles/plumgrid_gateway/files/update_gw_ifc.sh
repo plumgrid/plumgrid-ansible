@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright (c) 2015, PLUMgrid Inc, http://plumgrid.com
 #
@@ -22,8 +23,6 @@
 #
 # Usage: sh update_gw_ifc.sh -i eth0 -u add
 
-
-#!/bin/bash
 set -e
 
 update_option=add
