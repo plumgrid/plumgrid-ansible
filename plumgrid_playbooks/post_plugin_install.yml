@@ -27,6 +27,9 @@
 - hosts: neutron_server
   user: root
   tasks:
+    - file:
+        path: /usr/local/lib/python2.7/dist-packages/neutron/plugins/plumgrid
+        state: absent
     - name: Copy over plugin files
       copy:
         src: /tmp/puppet-neutron/files/plumgrid
