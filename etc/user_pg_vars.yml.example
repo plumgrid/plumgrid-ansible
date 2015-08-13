@@ -47,13 +47,14 @@ mgmt_override:
 hostname: "pg-{{ inventory_hostname }}"
 
 # Installation parameters
-enable_pg_metadata: False
+enable_pg_metadata: True 
 pg_metadata_ip: 169.254.169.254
 pg_metadata_port: 8775
 gpg_keypath: /var/lib/plumgrid/GPG-KEY
 install_license: True
 pg_license_path: /var/lib/plumgrid/pg_license
 lvm_keypath_content: /var/lib/plumgrid/id_rsa.pub
+required_pg_kernel: 3.16.0-45-generic
 
 pg_ports:
   vip_port: 443
