@@ -29,6 +29,11 @@
         path: "{{ lvm_keypath_content }}"
       register: lcm_key_present
       failed_when: lcm_enabled is defined and lcm_enabled == True and (lcm_key_present.stat.exists == False  or lcm_key_present.stat.size == 0)
+    - name: Checking for updated plugin code
+      stat:
+        path: /etc/plumgrid/rackspace/plugin/plumgrid
+      register: pg_plugin_present
+      failed_when: pg_plugin_present.stat.isdir is undefined or pg_plugin_present.stat.isdir == False
     - name: Add plugin locking support playbook
       lineinfile:
         dest: /opt/os-ansible-deployment/rpc_deployment/playbooks/openstack/openstack-setup.yml
@@ -37,6 +42,17 @@
         state: present
         create: yes
 
+- name: Check Kernel Version
+  hosts: infra_hosts:compute_hosts:gateway_hosts
+  user: root
+  tasks:
+    - name: Check Kernel Version
+      fail:
+        msg: >
+          Unsupported kernel Version found
+          [ {{ ansible_kernel }} > {{ required_pg_kernel }} ]
+          Resolve this issue before continuing.
+      when: required_pg_kernel is defined and (ansible_kernel | version_compare(required_pg_kernel, '>'))
 
 - name: Check Pre-Install Requirements
   hosts: infra_hosts
@@ -50,3 +66,4 @@
       wait_for: port={{ item.value }} state=absent timeout=10
       with_dict: pg_ports
       when: deb_check.stderr.find('no packages found') != -1
+

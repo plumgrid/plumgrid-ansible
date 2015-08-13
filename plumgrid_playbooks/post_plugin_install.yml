@@ -14,16 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- hosts: 127.0.0.1
-  connection: local
-  tasks:
-    - name: Cloning puppet-neutron
-      git:
-        repo: https://github.com/plumgrid/puppet-neutron.git
-        dest: /tmp/puppet-neutron
-        depth: 1
-        version: stable_4_1_2
-
 - hosts: neutron_server
   user: root
   tasks:
@@ -32,7 +22,7 @@
         state: absent
     - name: Copy over plugin files
       copy:
-        src: /tmp/puppet-neutron/files/plumgrid
+        src: /etc/plumgrid/rackspace/plugin/plumgrid
         dest: /usr/local/lib/python2.7/dist-packages/neutron/plugins
     - name: restart neutron server
       service: name=neutron-server state=restarted
