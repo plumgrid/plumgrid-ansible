@@ -22,7 +22,7 @@
         state: absent
     - name: Copy over plugin files
       copy:
-        src: /etc/plumgrid/rackspace/plugin/plumgrid
+        src: /etc/plumgrid/rackspace/plumgrid
         dest: /usr/local/lib/python2.7/dist-packages/neutron/plugins
     - name: restart neutron server
       service: name=neutron-server state=restarted
