@@ -39,6 +39,7 @@
   user: root
   roles:
     - plumgrid_common
+    - create_ifcs
     - plumgrid_gateway
   vars:
     lcm_ssh_key: "{{ lookup('file', lvm_keypath_content) }}"
