@@ -34,6 +34,11 @@
 
 - debug: var=current_gw_ifcs.stdout_lines
 
+- name: Insert gateway ifc update script
+  copy:
+    src: update_gw_ifc.sh
+    dest: /usr/local/bin/update_gw_ifc.sh
+
 - name: Check & update removed gateway interfaces
   command: sh /usr/local/bin/update_gw_ifc.sh -i {{ item[0] }} -u remove
   with_nested:
