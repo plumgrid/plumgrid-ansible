@@ -76,7 +76,7 @@ if [ -e /sys/class/net/$interface ]; then
           exit 1
         fi
       fi
-      sed -i "/$current_fabric = fabric_core host/d" /var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf
+      sed -i "/ fabric_core host/d" /var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf
 
       # Adding new fabric interface
       mac=$(cat /sys/class/net/$interface/address)

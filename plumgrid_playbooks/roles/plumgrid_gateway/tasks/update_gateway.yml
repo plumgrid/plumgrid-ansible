@@ -14,10 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Insert gateway ifc update script
-  copy:
-    src: update_gw_ifc.sh
-    dest: /usr/local/bin/update_gw_ifc.sh
+- name: Restart PLUMgrid services
+  service:
+    name: plumgrid
+    state: restarted
+
+- name: Check PLUMgrid services
+  shell: >
+    virsh -c lxc: lxc-enter-namespace plumgrid --noseclabel -- /usr/bin/service {{ pg_service_name }} status
+  register: pg_lxc_check
+  until: pg_lxc_check.stdout.find('start/running') != -1
+  retries: 3
+  delay: 5
 
 - name: Extract all currently defined Gateway interfaces
   shell: >
@@ -39,12 +47,3 @@
       - gateway_hosts
       - gateway_devs
   when: inventory_hostname == "{{item.0.hostname}}"
-
-- name: Insert Fabric interface update script
-  copy:
-    src: update_pg_ifc.sh
-    dest: /usr/local/bin/update_pg_ifc.sh
-
-- name: Update Fabric interface
-  command: sh /usr/local/bin/update_pg_ifc.sh -i {{ fabric_ifc_override[inventory_hostname] }}
-  when: fabric_ifc_override is defined and inventory_hostname in fabric_ifc_override
