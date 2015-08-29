@@ -14,9 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Insert gateway ifc update script
+  copy:
+    src: update_gw_ifc.sh
+    dest: /usr/local/bin/update_gw_ifc.sh
+
 - name: Checking for ifcs file existence
   stat:
-    path: "/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf"
+    path: "/var/lib/libvirt/filesystems/plumgrid/var/run/plumgrid/lxc/ifc_list_gateway"
   register: ifcs_present
 
 - name: Run Gateway Interface Checks
