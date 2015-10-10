@@ -38,7 +38,7 @@
       when:  pg_plugin_present.stat.isdir is defined and pg_plugin_present.stat.isdir == True
     - name: Add plugin locking support playbook
       lineinfile:
-        dest: /opt/os-ansible-deployment/rpc_deployment/playbooks/openstack/openstack-setup.yml
+        dest: /opt/openstack-ansible/rpc_deployment/playbooks/openstack/openstack-setup.yml
         insertafter: '^- include: neutron-all.yml'
         line: "- include: ../plumgrid-ansible/plumgrid_playbooks/post_plugin_install.yml"
         state: present
