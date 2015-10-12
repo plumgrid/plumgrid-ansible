@@ -81,14 +81,14 @@
 - name: Update PLUMgrid hostname
   replace:
     dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/etc/hostname"
-    replace: "pg-{{ inventory_hostname }}"
+    replace: "{{ inventory_hostname }}"
     regexp: "plumgrid"
 
 # Update hosts
 - name: Update /etc/hosts
   replace:
     dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/etc/hosts"
-    replace: "pg-{{ inventory_hostname }}"
+    replace: "{{ inventory_hostname }}"
     regexp: "plumgrid"
 
 - name: Set the LCM SSH key in place
