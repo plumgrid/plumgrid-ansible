@@ -44,7 +44,7 @@ pg_management: br-mgmt
 mgmt_override:
   gateway1: eth2
 
-hostname: "pg-{{ inventory_hostname }}"
+hostname: "{{ inventory_hostname }}"
 
 # Installation parameters
 enable_pg_metadata: False 

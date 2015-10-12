@@ -22,7 +22,7 @@ limitations under the License.
 Playbooks
 -------
 
-This set of playbooks integrate with the os-ansible-deployment project to deploy the PLUMgrid Controller and Compute components that help manage the PLUMgrid neutron plugin. The plugin itself must be enabled through the os-ansible-deployment neutron playbooks as follows.
+This set of playbooks integrate with the openstack-ansible project to deploy the PLUMgrid Controller and Compute components that help manage the PLUMgrid neutron plugin. The plugin itself must be enabled through the openstack-ansible neutron playbooks as follows.
 
 1. Set the following parameter to ``plumgrid`` in the ``rpc_deployment/inventory/group_vars/neutron_all.yml`` file.
 
