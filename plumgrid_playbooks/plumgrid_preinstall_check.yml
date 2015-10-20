@@ -29,23 +29,9 @@
         path: "{{ lvm_keypath_content }}"
       register: lcm_key_present
       failed_when: lcm_enabled is defined and lcm_enabled == True and (lcm_key_present.stat.exists == False  or lcm_key_present.stat.size == 0)
-    - name: Checking for updated plugin code
-      stat:
-        path: /etc/plumgrid/rackspace/plugin
-      register: pg_plugin_present
-    - name: Move plugin to plumgrid directory
-      command: creates="/etc/plumgrid/rackspace/plumgrid" mv /etc/plumgrid/rackspace/plugin /etc/plumgrid/rackspace/plumgrid
-      when:  pg_plugin_present.stat.isdir is defined and pg_plugin_present.stat.isdir == True
-    - name: Add plugin locking support playbook
-      lineinfile:
-        dest: /opt/openstack-ansible/rpc_deployment/playbooks/openstack/openstack-setup.yml
-        insertafter: '^- include: neutron-all.yml'
-        line: "- include: ../plumgrid-ansible/plumgrid_playbooks/post_plugin_install.yml"
-        state: present
-        create: yes
 
 - name: Check Kernel Version
-  hosts: infra_hosts:compute_hosts:gateway_hosts
+  hosts: shared-infra_hosts:compute_hosts:gateway_hosts
   user: root
   tasks:
     - name: Check Kernel Version
@@ -57,7 +43,7 @@
       when: required_pg_kernel is defined and (ansible_kernel | version_compare(required_pg_kernel, '>'))
 
 - name: Check Pre-Install Requirements
-  hosts: infra_hosts
+  hosts: shared-infra_hosts
   user: root
   tasks:
     - name: Check if plumgrid is installed

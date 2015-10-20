@@ -14,14 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- hosts: infra_hosts
+- hosts: shared-infra_hosts
   user: root
   roles:
     - plumgrid_common
     - create_ifcs
     - plumgrid_director
   vars:
-    lcm_ssh_key: "{{ lookup('file', lvm_keypath_content) }}"
     pg_service_name: plumgrid
   any_errors_fatal: yes
 
@@ -32,7 +31,6 @@
     - create_ifcs
     - plumgrid_edge
   vars:
-    lcm_ssh_key: "{{ lookup('file', lvm_keypath_content) }}"
     pg_service_name: plumgrid-iovisor
 
 - hosts: gateway_hosts
@@ -42,7 +40,6 @@
     - create_ifcs
     - plumgrid_gateway
   vars:
-    lcm_ssh_key: "{{ lookup('file', lvm_keypath_content) }}"
     pg_service_name: plumgrid-iovisor
 
 - hosts: 127.0.0.1
@@ -50,24 +47,24 @@
   tasks:
     - name: Remove Metadata IP from nova conf
       replace:
-        dest: /opt/openstack-ansible/rpc_deployment/roles/nova_common/templates/nova.conf
+        dest: /opt/openstack-ansible/playbooks/roles/os_nova/templates/nova.conf.j2
         regexp: '^metadata_host'
         replace: '#metadata_host'
     - name: Add neutron url timeouts to nova.conf
       lineinfile:
-        dest: /opt/openstack-ansible/rpc_deployment/roles/nova_common/templates/nova.conf
+        dest: /opt/openstack-ansible/playbooks/roles/os_nova/templates/nova.conf.j2
         insertafter: '\[neutron\]'
         line: "url_timeout = 200"
         state: present
         create: yes
     - name: Enable metadata play on Edges
       replace:
-        dest: /opt/openstack-ansible/rpc_deployment/playbooks/openstack/nova-api-metadata.yml
-        regexp: 'nova_api_metadata$'
-        replace: 'nova_api_metadata:compute_hosts'
+        dest: /opt/openstack-ansible/playbooks/roles/os_nova/tasks/nova_upstart_init.yml
+        regexp: "groups['nova_api_metadata']$"
+        replace: "groups['nova_api_metadata'] or inventory_hostname in groups['compute_hosts']"
       when: enable_pg_metadata == True
 
-- hosts: infra_hosts
+- hosts: shared-infra_hosts
   user: root
   tasks:
     - name: Restart libvirt-bin

@@ -91,12 +91,17 @@
     replace: "{{ inventory_hostname }}"
     regexp: "plumgrid"
 
+- name: Get LCM key if present
+  set_fact:
+    lcm_ssh_key: "{{ lookup('file', lvm_keypath_content) }}"
+  when: lcm_enabled is defined and lcm_enabled == True
+
 - name: Set the LCM SSH key in place
   lineinfile:
     dest: "/var/lib/libvirt/filesystems/plumgrid-data/root/.ssh/authorized_keys"
     line: "{{ lcm_ssh_key }}"
     create: yes
-  when: lcm_ssh_key != ""
+  when: lcm_enabled is defined and lcm_enabled == True and lcm_ssh_key != ""
 
 # Removing network-manager
 - name: Removing network-manager

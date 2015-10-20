@@ -18,10 +18,15 @@
   user: root
   tasks:
     - name: Ensure stopped neutron agent services
-      service: name={{ item }} state=stopped pattern={{ item }}
+      service:
+        name: "{{ item.value.service_name }}"
+        state: stopped
+        pattern: "{{ item.value.service_name }}"
       register: service_stopped
       failed_when: "'msg' in service_stopped and 'FAIL' in service_stopped.msg|upper"
-      with_items: "{{ neutron_services|map(attribute='service_name')|list }}"
+      with_dict: neutron_services
+  vars_files:
+    - ../../roles/os_neutron/defaults/main.yml
 
 - hosts: neutron_server
   user: root
