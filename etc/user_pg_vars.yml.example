@@ -20,7 +20,7 @@
 
 # Repo Link hosting PLUMgrid packages
 plumgrid_repo: <Repo Link>
-plumgrid_component: everest
+plumgrid_component: fuji
 
 # PLUMgrid Zone configuration
 plumgrid_ip: <Infra IPs comma seperated>
@@ -47,7 +47,7 @@ mgmt_override:
 hostname: "{{ inventory_hostname }}"
 
 # Installation parameters
-enable_pg_metadata: False 
+enable_pg_metadata: False
 pg_metadata_ip: 169.254.169.254
 pg_metadata_port: 8775
 gpg_keypath: /var/lib/plumgrid/GPG-KEY
