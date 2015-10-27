@@ -60,8 +60,8 @@
     - name: Enable metadata play on Edges
       replace:
         dest: /opt/openstack-ansible/playbooks/roles/os_nova/tasks/nova_upstart_init.yml
-        regexp: "groups['nova_api_metadata']$"
-        replace: "groups['nova_api_metadata'] or inventory_hostname in groups['compute_hosts']"
+        regexp: 'nova_api_metadata'
+        replace: 'compute_hosts'
       when: enable_pg_metadata == True
 
 - hosts: shared-infra_hosts

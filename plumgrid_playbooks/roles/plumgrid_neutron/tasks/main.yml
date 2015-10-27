@@ -14,12 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Installing python-retrying dependency
-- name: Install python-retrying
-  pip:
-    name: retrying
-    state: latest
-
 # Remove sources file if exists
 - name: Removing pre-exiting sources.list
   file: path=/etc/apt/sources.list.d/plumgrid.list state=absent
