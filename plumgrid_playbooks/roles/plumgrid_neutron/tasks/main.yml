@@ -70,9 +70,3 @@
     line: "NEUTRON_PLUGIN_CONFIG=\"/etc/neutron/plugins/plumgrid/plumgrid.ini\""
     state: present
     create: yes
-
-- name: Start neutron server
-  service: name=neutron-server state=started
-  register: service_started
-  failed_when: "'msg' in service_started and 'FAIL' in service_started.msg|upper"
-
