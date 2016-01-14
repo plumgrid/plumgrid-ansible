@@ -29,6 +29,13 @@
         path: "{{ lvm_keypath_content }}"
       register: lcm_key_present
       failed_when: lcm_enabled is defined and lcm_enabled == True and (lcm_key_present.stat.exists == False  or lcm_key_present.stat.size == 0)
+    - name: Add plumgrid installation into venv playbook
+      lineinfile:
+        dest: /opt/openstack-ansible/playbooks/setup-openstack.yml
+        insertafter: '^- include: os-neutron-install.yml'
+        line: "- include: /opt/plumgrid-ansible/plumgrid_playbooks/post_neutron_plumgrid.yml"
+        state: present
+        create: yes
 
 - name: Check Kernel Version
   hosts: shared-infra_hosts:compute_hosts:gateway_hosts
