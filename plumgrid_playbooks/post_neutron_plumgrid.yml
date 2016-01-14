@@ -14,18 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- hosts: neutron_server
-  user: root
-  tasks:
-     # Install plumgridlib on enabled venv
-     - name: Install plumgridlib in neutron venv
-       shell: |
-          source {{ neutron_venv_bin }}/activate && python setup.py install
-       args:
-         executable: "/bin/bash"
-         chdir: /opt/pg/lib/python2.7/dist-packages/plumgrid-pythonlib
-       when: neutron_venv_enabled | bool
-#  vars:
-#     - neutron_venv_tag: "{{ openstack_release }}"
-  vars_files:
-     - /opt/openstack-ansible/playbooks/roles/os_neutron/defaults/main.yml
+# Install plumgridlib on enabled venv
+- name: Install plumgridlib in neutron venv
+  shell: |
+     source {{ neutron_venv_bin }}/activate && python setup.py install
+  args:
+    executable: "/bin/bash"
+    chdir: /opt/pg/lib/python2.7/dist-packages/plumgrid-pythonlib
+  when:
+    - neutron_venv_enabled | bool
+    - inventory_hostname in groups['neutron_server']
