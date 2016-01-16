@@ -80,8 +80,8 @@ real3: "{{ plumgrid_ip.split(',')[2] }}"
 # L2 Gateway Support
 # Set this to an appropiate value before deployment to enable L2 GW support
 hardware_vendor_type: vendor_type
-sw_username: plumgrid
-sw_password: plumgrid
+switch_username: plumgrid
+switch_password: plumgrid
 
 # Gateway Hosts and their interfaces
 gateway_hosts:
