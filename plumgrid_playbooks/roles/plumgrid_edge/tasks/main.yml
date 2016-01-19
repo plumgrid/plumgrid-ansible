@@ -41,7 +41,7 @@
 
 - name: Check PLUMgrid services
   shell: >
-    virsh -c lxc: lxc-enter-namespace plumgrid --noseclabel -- /usr/bin/service {{ pg_service_name }} status
+   /opt/local/bin/nsenter -t $(ps ho pid --ppid $(cat /var/run/libvirt/lxc/plumgrid.pid)) -m -n -u -i -p /usr/bin/service {{ pg_service_name }} status
   register: pg_lxc_check
   until: pg_lxc_check.stdout.find('start/running') != -1
   retries: 3
