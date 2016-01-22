@@ -22,6 +22,7 @@
   until: remove_pglib_venev|success
   retries: 5
   delay: 2
+  ignore_errors: True
   when:
     - neutron_venv_enabled | bool
     - inventory_hostname in groups['neutron_server']
