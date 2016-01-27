@@ -65,6 +65,7 @@ pg_ports:
   pgcli_port: 3000
   http_redirect_port: 9080
   pg_rsync_port: 2222
+  mw_port: 4000
 
 # keepalived config
 keepalived_router_id: "{{ pg_vip.split('.')[3] }}"
