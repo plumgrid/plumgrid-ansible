@@ -29,6 +29,40 @@
         path: "{{ lvm_keypath_content }}"
       register: lcm_key_present
       failed_when: lcm_enabled is defined and lcm_enabled == True and (lcm_key_present.stat.exists == False  or lcm_key_present.stat.size == 0)
+    - name: Download os-pg-version file from repo
+      get_url:
+        url: "{{ plumgrid_repo }}/files/pg_os_version.yaml"
+        dest: /tmp/pg_os_version.yaml
+        force: true
+    - name: Download lvm-installer
+      get_url:
+        url: "{{ plumgrid_repo }}/files/lvm-installer.sh"
+        dest: /tmp/lvm-installer.sh
+        force: true
+    - name: Extract PG version
+      shell: >
+        cat /tmp/lvm-installer.sh | grep pg_ver= | awk 'NR==1 {print}'| cut -c9-| sed 's/-.*//'
+      register: pg_ver
+    - name: Lookup networking-plumgrid version
+      shell: >
+        cat /tmp/pg_os_version.yaml | grep {{ pg_ver.stdout+'-k' }} | cut -d ' ' -f2
+      register: os_ver
+    - name: Remove pre-existing networking-plumgrid dict if exists
+      lineinfile:
+        dest: /etc/openstack_deploy/user_pg_vars.yml
+        line: "neutron_plumgrid_pip_packages:"
+        state: absent
+    - name: Remove pre-existing networking-plumgrid version if exists
+      lineinfile:
+        dest: /etc/openstack_deploy/user_pg_vars.yml
+        regexp: ".- networking-plumgrid==."
+        state: absent
+    - name: Add networking-plumgrid version to vars
+      lineinfile:
+        dest: /etc/openstack_deploy/user_pg_vars.yml
+        line: "\nneutron_plumgrid_pip_packages:\n  - networking-plumgrid=={{ os_ver.stdout }}"
+        insertafter: 'switch_password: plumgrid'
+        state: present
 
 - name: Check Kernel Version
   hosts: shared-infra_hosts:compute_hosts:gateway_hosts
