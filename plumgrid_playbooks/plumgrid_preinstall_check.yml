@@ -63,6 +63,16 @@
         line: "\nneutron_plumgrid_pip_packages:\n  - networking-plumgrid=={{ os_ver.stdout }}"
         insertafter: 'switch_password: plumgrid'
         state: present
+    - name: Add plumgrid_db_setup.yml playbook
+      lineinfile:
+        dest: /opt/openstack-ansible/playbooks/roles/os_neutron/tasks/main.yml
+        state: present
+        line: "- include: plumgrid_db_setup.yml"
+    - name: Copy over plumgrid_db_setup
+      copy:
+        src: plumgrid_db_setup.yml
+        dest: /opt/openstack-ansible/playbooks/roles/os_neutron/tasks/plumgrid_db_setup.yml
+
 
 - name: Check Kernel Version
   hosts: shared-infra_hosts:compute_hosts:gateway_hosts
