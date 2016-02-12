@@ -15,7 +15,8 @@
 # limitations under the License.
 
 - name: Perform a PLUMgrid DB Upgrade
-  command: |
-    plumgrid-db-manage upgrade heads
+  shell: |
+    /usr/local/bin/plumgrid-db-manage upgrade heads
   sudo: yes
   sudo_user: "{{ neutron_system_user_name }}"
+  when: inventory_hostname in groups['neutron_server']
