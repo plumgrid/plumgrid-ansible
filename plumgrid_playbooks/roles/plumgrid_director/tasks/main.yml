@@ -41,8 +41,8 @@
   when: install_license == True and inventory_hostname == groups['shared-infra_hosts'][0]
   register: login_status
   until: login_status.stdout == '200'
-  retries: 8
-  delay: 15
+  retries: 30
+  delay: 10
 
 - name: Install PLUMgrid License
   shell: >
