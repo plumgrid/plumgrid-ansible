@@ -22,27 +22,12 @@ limitations under the License.
 Playbooks
 -------
 
-This set of playbooks integrate with the openstack-ansible project to deploy the PLUMgrid Controller and Compute components that help manage the PLUMgrid neutron plugin. The plugin itself must be enabled through the openstack-ansible neutron playbooks as follows.
-
-1. Set the following parameter to ``plumgrid`` in the ``rpc_deployment/inventory/group_vars/neutron_all.yml`` file.
-
-.. code-block:: yaml
-
-  # Neutron Plugins
-  neutron_plugin_type: plumgrid
+This set of playbooks integrate with the openstack-ansible project to deploy the PLUMgrid Controller and Compute components that help manage the PLUMgrid neutron plugin. The plugin itself must be enabled through the openstack-ansible neutron playbooks.
 
 
-2. Also in the same file, disable the installation of all neutron-agents in the ``neutron_services`` dictionary, by setting their ``service_en`` keys to ``false``
+Follow the community installation guide for OSA PLUMgrid here for full installation steps:
 
-3. The PLUMgrid playbooks can then be cloned into the ``../playbooks/`` directory.
-
-4. Create a user variables file, using the sample in ``etc/user_pg_vars.yml.example`` and place it in ``/etc/rpc_deploy/``
-
-5. Run the playbooks with (do this before the openstack-setup.yml playbook is run):
-
-.. code-block:: yaml
-
-   openstack-ansible playbooks/plumgrid-ansible/plumgrid_playbooks/plumgrid_all.yml
+ *http://docs.openstack.org/developer/openstack-ansible/install-guide/app-plumgrid.html*
 
 Notes
 -------
