@@ -37,7 +37,7 @@
 
 - name: Login to PLUMgrid
   shell: >
-    curl -H "Accept: application/json" -H "Content-Type: application/json" -k -X POST https://{{ pg_vip }}/0/login -d '{"userName":"plumgrid","password":"plumgrid"}' -c /tmp/cookie -i | grep HTTP | awk '{print $2}'
+    curl -H "Accept: application/json" -H "Content-Type: application/json" -k -X POST https://{{ pg_vip }}/0/login -d '{"userName":"{{ pg_username }}","password":"{{ pg_password }}"}' -c /tmp/cookie -i | grep HTTP | awk '{print $2}'
   when: install_license == True and inventory_hostname == groups['shared-infra_hosts'][0]
   register: login_status
   until: login_status.stdout == '200'
