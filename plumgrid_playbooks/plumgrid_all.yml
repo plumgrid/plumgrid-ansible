@@ -19,5 +19,3 @@
 - include: plumgrid_neutron.yml
 
 - include: plumgrid_common.yml
-
-- include: enable_pg_extensions.yml
