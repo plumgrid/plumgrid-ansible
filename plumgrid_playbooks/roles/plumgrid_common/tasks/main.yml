@@ -119,8 +119,8 @@
   changed_when: false
 
 # Copy config file for OPSVM
- - name: Drop OPSVM conf
-   template:
-     src: "00-pg.conf"
-     dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/etc/00-pg.conf"
-   when: middleware_ip is defined
+- name: Drop OPSVM conf
+  template:
+    src: "00-pg.conf"
+    dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/etc/00-pg.conf"
+  when: middleware_ip is defined
