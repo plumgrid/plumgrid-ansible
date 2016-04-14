@@ -38,6 +38,39 @@
       copy:
         src: post_neutron_plumgrid.yml
         dest: /opt/openstack-ansible/playbooks/roles/os_neutron/tasks/post_neutron_plumgrid.yml
+    - name: Include LBaaS in user variables
+      lineinfile:
+        dest: /etc/openstack_deploy/user_variables.yml
+        state: present
+        line: "{{ item }}"
+      with_items:
+        - "neutron_plugin_base:"
+        - "  - neutron_lbaas.services.loadbalancer.plugin.LoadBalancerPlugin"
+      when: 
+        - enable_lbaas is defined
+        - enable_lbaas | bool
+    - name: Add PG filters in LBaaS Haproxy filters file
+      lineinfile:
+        dest: /opt/openstack-ansible/playbooks/roles/os_neutron/files/rootwrap.d/lbaas-haproxy.filters
+        state: present
+        line: "{{ item }}"
+      with_items:
+        - "ifc_ctl: CommandFilter, /opt/pg/bin/ifc_ctl, root, ifc_ctl"
+        - "ip: CommandFilter, ip, root, ip"
+      when: 
+        - enable_lbaas is defined
+        - enable_lbaas | bool
+    - name: Replace LBaaS interface driver with PLUMgrid LBaaS interface driver
+      lineinfile:
+        dest: /opt/openstack-ansible/playbooks/roles/os_neutron/templates/lbaas_agent.ini.j2
+        backup: yes
+        state: present
+        regexp: "^interface_driver ="
+        insertafter: "^interface_driver ="
+        line: "interface_driver = plumgridlib.lbaas.interface_driver.PLUMgridInterfaceDriver"
+      when: 
+        - enable_lbaas is defined
+        - enable_lbaas | bool
 
 - name: Check Kernel Version
   hosts: shared-infra_hosts:compute_hosts:gateway_hosts
