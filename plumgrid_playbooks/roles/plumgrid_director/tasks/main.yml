@@ -60,3 +60,13 @@
   until: pg_lxc_check.stdout.find('start/running') != -1
   retries: 3
   delay: 5
+
+# Install package plumgrid-pythonlib
+- name: Install plumgrid-pythonlib
+  apt:
+    name: plumgrid-pythonlib
+    state: latest
+    force: yes
+  when: 
+    - enable_lbaas is defined
+    - enable_lbaas | bool

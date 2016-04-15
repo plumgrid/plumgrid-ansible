@@ -37,3 +37,16 @@
   when:
     - neutron_venv_enabled | bool
     - inventory_hostname in groups['neutron_server']
+
+# Install plumgridlib on enabled venv on infra nodes for LBaaS
+- name: Install plumgridlib in neutron venv
+  shell: |
+     source {{ neutron_venv_bin }}/activate && python setup.py install
+  args:
+    executable: "/bin/bash"
+    chdir: /opt/pg/lib/python2.7/dist-packages/plumgrid-pythonlib
+  when:
+    - enable_lbaas is defined
+    - enable_lbaas | bool
+    - neutron_venv_enabled | bool
+    - inventory_hostname in groups['network_hosts']
