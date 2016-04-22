@@ -120,7 +120,7 @@ if [ -e /sys/class/net/$interface ]; then
     fi
   else
     echo Interface file does not exist.... doing nothing.
-    exit 1
+    exit 0
   fi
 
 else
