@@ -1,11 +1,11 @@
 PLUMgrid Playbooks for OpenStack
 ##########################################
-:date: 2015-06-12 09:00
+:date: 2016-05-19 09:00
 :tags: networking, openstack, cloud, ansible
 
 License
 -------
-Copyright 2015 PLUMgrid Inc.
+Copyright 2016 PLUMgrid Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,15 +22,14 @@ limitations under the License.
 Playbooks
 -------
 
-This set of playbooks integrate with the openstack-ansible project to deploy the PLUMgrid Controller and Compute components that help manage the PLUMgrid neutron plugin. The plugin itself must be enabled through the openstack-ansible neutron playbooks. 
+This set of playbooks integrate with the openstack-ansible project to deploy the PLUMgrid Controller and Compute components that help manage the PLUMgrid neutron plugin. The plugin itself must be enabled through the openstack-ansible neutron playbooks.
 
 Follow the community installation guide for OSA PLUMgrid here for full installation steps:
 
  *http://docs.openstack.org/developer/openstack-ansible/install-guide/app-plumgrid.html*
- 
+
 
 Notes
 -------
 
 Contact PLUMgrid for an Installation pack (including Full/Trial License, deployment documentation): info@plumgrid.com
-
