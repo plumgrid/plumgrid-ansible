@@ -33,6 +33,13 @@
     line: "deb {{ plumgrid_repo }}/plumgrid-images plumgrid {{ plumgrid_component }}"
     state: present
 
+# Add PLUMgrid openstack liberty to repo
+- name: Add openstack liberty to repo
+  lineinfile:
+    dest: /etc/apt/sources.list.d/plumgrid.list
+    line: "deb {{ plumgrid_repo }}/openstack/deb/liberty openstack-liberty {{ plumgrid_component }}"
+    state: present
+
 # Copy GPG-key file to target nodes
 - name: Copy Plumgrid GPG-key file
   template:
@@ -54,6 +61,13 @@
 - name: Install plumgrid-pythonlib
   apt:
     name: plumgrid-pythonlib
+    state: latest
+    force: yes
+
+# Install package networking-plumgrid
+- name: Install networking-plumgrid
+  apt:
+    name: networking-plumgrid
     state: latest
     force: yes
 
