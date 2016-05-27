@@ -87,12 +87,12 @@
       register: pg_ver
     - name: Lookup networking-plumgrid version
       shell: >
-        cat /tmp/pg_os_version.yaml | grep {{ pg_ver.stdout+'-k' }} | cut -d ' ' -f2
+        cat /tmp/pg_os_version.yaml | grep {{ pg_ver.stdout+'-l' }} | cut -d ' ' -f2
       register: os_ver
     - name: Remove pre-existing networking-plumgrid dict if exists
       lineinfile:
         dest: /etc/openstack_deploy/user_pg_vars.yml
-        line: "neutron_plumgrid_pip_packages:"
+        line: "neutron_optional_plumgrid_pip_packages:"
         state: absent
     - name: Remove pre-existing networking-plumgrid version if exists
       lineinfile:
@@ -102,7 +102,7 @@
     - name: Add networking-plumgrid version to vars
       lineinfile:
         dest: /etc/openstack_deploy/user_pg_vars.yml
-        line: "\nneutron_plumgrid_pip_packages:\n  - networking-plumgrid=={{ os_ver.stdout }}"
+        line: "\neutron_optional_plumgrid_pip_packages:\n  - networking-plumgrid=={{ os_ver.stdout }}"
         insertafter: 'switch_password: plumgrid'
         state: present
 
@@ -130,4 +130,3 @@
       wait_for: port={{ item.value }} state=absent timeout=10
       with_dict: pg_ports
       when: deb_check.stderr.find('no packages found') != -1
-
