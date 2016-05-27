@@ -69,7 +69,7 @@
     - name: Add networking-plumgrid version to vars
       lineinfile:
         dest: /etc/openstack_deploy/user_pg_vars.yml
-        line: "\neutron_optional_plumgrid_pip_packages:\n  - networking-plumgrid=={{ os_ver.stdout }}"
+        line: "\nneutron_optional_plumgrid_pip_packages:\n  - networking-plumgrid=={{ os_ver.stdout }}"
         insertafter: 'switch_password: plumgrid'
         state: present
 
