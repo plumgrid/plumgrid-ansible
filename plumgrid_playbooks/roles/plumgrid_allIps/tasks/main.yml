@@ -1,0 +1,49 @@
+---
+#
+# Copyright (c) 2016, PLUMgrid Inc, http://plumgrid.com
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Delete previous instance of allIps config file
+  file:
+    path: /tmp/allIps.conf
+    state: absent
+  delegate_to: localhost
+
+- name: Setup allIps config
+  template:
+    src: allIps.conf
+    dest: /tmp/allIps.conf
+
+- name: Reading allIps file
+  shell: cat /tmp/allIps.conf
+  register: put_data
+
+- name: Extract IPs data
+  set_fact:
+    putData: "{{ put_data.stdout.replace('\\n','') | to_json }}"
+    zone: "{{ lvm_keypath_content.replace('/var/lib/plumgrid/zones/','').replace('/id_rsa.pub','') }}"
+
+- name: Request SAPI to register zone IPs
+  shell: >
+    curl --write-out %{http_code} --silent --output /dev/null -H "Content-Type: application/json" -X PUT -d {{ '"' }}{{ putData }}{{ '"' }} http://{{ sapiServer }}:{{ pg_ports['sapi_port'] }}/{{ sapiVersion }}/zones/{{ zone }}/allIps
+  register: curlReply
+  until: curlReply.stdout == '200'
+  retries: 5
+  delay: 5
+
+- name: Remove allIps file
+  file:
+    path: /tmp/allIps.conf
+    state: absent
+  delegate_to: localhost

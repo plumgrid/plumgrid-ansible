@@ -1,0 +1,46 @@
+---
+#
+# Copyright (c) 2016, PLUMgrid Inc, http://plumgrid.com
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Delete previous files
+  file:
+    path: /tmp/cloudApexVersion.conf
+    state: absent
+  delegate_to: localhost
+
+- name: Check if CloudApex is installed
+  stat:
+    path: /var/lib/libvirt/filesystems/plumgrid/opt/pg/web/cloudApex
+  register: ca_stats
+
+- name: Initialze CloudApex version
+  set_fact:
+    apexVersion: ""
+
+- name: Check version of CloudApex
+  shell: >
+    cat /var/lib/libvirt/filesystems/plumgrid/opt/pg/web/cloudApex/modules/appCloudApex/appCloudApex.js | grep -i appversion | awk '{print $2}'
+  when: ca_stats.stat.exists and (ca_stats.stat.isdir is defined and ca_stats.stat.isdir)
+  register: ca_ver
+
+- name: Register CloudApex version
+  when: ca_stats.stat.exists and (ca_stats.stat.isdir is defined and ca_stats.stat.isdir)
+  set_fact:
+    apexVersion: "{{ ca_ver.stdout }}"
+
+- name: Save CloudApex version
+  shell: >
+    echo {{ apexVersion }} >> /tmp/cloudApexVersion.conf
+  delegate_to: localhost

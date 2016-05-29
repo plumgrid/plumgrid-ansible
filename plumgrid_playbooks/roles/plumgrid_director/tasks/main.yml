@@ -35,23 +35,47 @@
     name: plumgrid
     state: restarted
 
-- name: Login to PLUMgrid
-  shell: >
-    curl -H "Accept: application/json" -H "Content-Type: application/json" -k -X POST https://{{ pg_vip }}/0/login -d '{"userName":"{{ pg_username }}","password":"{{ pg_password }}"}' -c /tmp/cookie -i | grep HTTP | awk '{print $2}'
-  when: install_license == True and inventory_hostname == groups['shared-infra_hosts'][0]
-  register: login_status
-  until: login_status.stdout == '200'
-  retries: 30
-  delay: 10
+- name: Extract zone name
+  set_fact:
+    zone: "{{ lvm_keypath_content.replace('/var/lib/plumgrid/zones/','').replace('/id_rsa.pub','') }}"
+  when: inventory_hostname == groups['shared-infra_hosts'][0]
 
-- name: Install PLUMgrid License
+- name: Remove previous instance of license file
+  file:
+    path: /tmp/license.conf
+    state: absent
+  when: inventory_hostname == groups['shared-infra_hosts'][0]
+
+- name: Setup license config
+  template:
+    src: license.conf
+    dest: /tmp/license.conf
+  when: inventory_hostname == groups['shared-infra_hosts'][0]
+
+- name: Generate license data
+  shell: cat /tmp/license.conf
+  register: put_data
+  when: inventory_hostname == groups['shared-infra_hosts'][0]
+
+- name: Generate license call JSON
+  set_fact:
+    putData: "{{ put_data.stdout | to_json }}"
+  when: inventory_hostname == groups['shared-infra_hosts'][0]
+
+- name: Request SAPI for license registration
   shell: >
-    curl -H "Accept: application/json" -H "Content-Type: application/json" https://{{ pg_vip }}/0/tenant_manager/license_key/key1 -k -X PUT -d '{"license": "{{pg_license}}"}' -i -b /tmp/cookie -k| grep HTTP | awk '{print $2}'
-  when: install_license == True and inventory_hostname == groups['shared-infra_hosts'][0]
-  register: license_put_status
-  until: license_put_status.stdout == '200'
-  retries: 5
-  delay: 10
+    curl --write-out %{http_code} --silent --output /dev/null -H "Accept: application/json" -H "Content-Type: application/json" -X PUT -d {{ '"' }}{{ putData }}{{ '"' }}  http://{{ sapiServer }}:{{ pg_ports['sapi_port'] }}/{{ sapiVersion }}/zones/{{ zone }}/pgLicense
+  when: inventory_hostname == groups['shared-infra_hosts'][0]
+  register: license_status
+  until: license_status.stdout == '200'
+  retries: 3
+  delay: 5
+
+- name: Remove license file
+  file:
+    path: /tmp/license.conf
+    state: absent
+  when: inventory_hostname == groups['shared-infra_hosts'][0]
 
 - name: Check PLUMgrid services
   shell: >
