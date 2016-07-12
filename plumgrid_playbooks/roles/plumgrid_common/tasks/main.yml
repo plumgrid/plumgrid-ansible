@@ -124,3 +124,29 @@
     src: "00-pg.conf"
     dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/etc/00-pg.conf"
   when: middleware_ip is defined
+
+# Stop Analyst service
+- name: Stop PLUMgrid Analyst service
+  shell: >
+    /opt/local/bin/nsenter -t $(ps ho pid --ppid $(cat /var/run/libvirt/lxc/plumgrid.pid)) -m -n -u -i -p /usr/bin/service plumgrid-sigmund stop
+  register: pg_sigmund_check
+  until: pg_sigmund_check.stdout.find('stop/waiting') != -1
+  ignore_errors: yes
+  retries: 3
+  delay: 5
+
+# Configure Analyst for OPSVM
+- name: Configure Analyst
+  shell: >
+    /opt/local/bin/nsenter -t $(ps ho pid --ppid $(cat /var/run/libvirt/lxc/plumgrid.pid)) -m -n -u -i -p /usr/src/sigmund-configure --ip {{ middleware_ip }} --start --autoboot
+  ignore_errors: yes
+
+# Ensure Analyst service running
+- name: Ensure PLUMgrid Analyst service
+  shell: >
+    /opt/local/bin/nsenter -t $(ps ho pid --ppid $(cat /var/run/libvirt/lxc/plumgrid.pid)) -m -n -u -i -p /usr/bin/service plumgrid-sigmund status
+  register: pg_sigmund_check
+  until: pg_sigmund_check.stdout.find('start/running') != -1
+  ignore_errors: yes
+  retries: 3
+  delay: 5
