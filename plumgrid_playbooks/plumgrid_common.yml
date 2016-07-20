@@ -47,19 +47,19 @@
   tasks:
     - name: Remove Metadata IP from nova conf
       replace:
-        dest: /opt/openstack-ansible/playbooks/roles/os_nova/templates/nova.conf.j2
+        dest: /etc/ansible/roles/os_nova/templates/nova.conf.j2
         regexp: '^metadata_host'
         replace: '#metadata_host'
     - name: Add neutron url timeouts to nova.conf
       lineinfile:
-        dest: /opt/openstack-ansible/playbooks/roles/os_nova/templates/nova.conf.j2
+        dest: /etc/ansible/roles/os_nova/templates/nova.conf.j2
         insertafter: '\[neutron\]'
         line: "url_timeout = 200"
         state: present
         create: yes
     - name: Enable metadata play on Edges
       replace:
-        dest: /opt/openstack-ansible/playbooks/roles/os_nova/tasks/nova_upstart_init.yml
+        dest: /etc/ansible/roles/os_nova/tasks/nova_upstart_init.yml
         regexp: 'nova_api_metadata'
         replace: 'compute_hosts'
       when: enable_pg_metadata == True

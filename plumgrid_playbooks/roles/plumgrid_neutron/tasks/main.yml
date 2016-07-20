@@ -64,15 +64,6 @@
     state: latest
     force: yes
 
-# Install plumgridlib on enabled venv
-- name: Install plumgridlib in neutron venv
-  shell: |
-     source {{ neutron_venv_bin }}/activate && python setup.py install
-  args:
-    executable: "/bin/bash"
-    chdir: /opt/pg/lib/python2.7/dist-packages/plumgrid-pythonlib
-  when: neutron_venv_enabled | bool
-
 # Link plumgrid ini
 - name: Link plumgrid ini
   lineinfile:

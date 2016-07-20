@@ -40,4 +40,4 @@
       retries: 5
       delay: 2
   vars_files:
-    - /opt/openstack-ansible/playbooks/roles/os_neutron/defaults/main.yml
+    - /etc/ansible/roles/os_neutron/defaults/main.yml

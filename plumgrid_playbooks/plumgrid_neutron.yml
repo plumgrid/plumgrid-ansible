@@ -26,7 +26,7 @@
       failed_when: "'msg' in service_stopped and 'FAIL' in service_stopped.msg|upper"
       with_dict: neutron_services
   vars_files:
-    - /opt/openstack-ansible/playbooks/roles/os_neutron/defaults/main.yml
+    - /etc/ansible/roles/os_neutron/defaults/main.yml
 
 - hosts: neutron_server
   user: root
@@ -34,4 +34,4 @@
    - role: "plumgrid_neutron"
      neutron_venv_tag: "{{ openstack_release }}"
   vars_files:
-   - /opt/openstack-ansible/playbooks/roles/os_neutron/defaults/main.yml
+   - /etc/ansible/roles/os_neutron/defaults/main.yml
