@@ -18,6 +18,9 @@
 # The variables used by the PLUMgrid playbooks
 # Replace all < > placeholders with appropiate values before beginning an installation
 
+# Enabling PLUMgrid plugin
+neutron_plugin_type: plumgrid
+
 # Repo Link hosting PLUMgrid packages
 plumgrid_repo: <Repo Link>
 plumgrid_component: everest
@@ -47,7 +50,7 @@ mgmt_override:
 hostname: "{{ inventory_hostname }}"
 
 # Installation parameters
-enable_pg_metadata: True 
+enable_pg_metadata: True
 pg_metadata_ip: 169.254.169.254
 pg_metadata_port: 8775
 gpg_keypath: /var/lib/plumgrid/GPG-KEY
