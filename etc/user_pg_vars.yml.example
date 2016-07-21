@@ -18,6 +18,9 @@
 # The variables used by the PLUMgrid playbooks
 # Replace all < > placeholders with appropiate values before beginning an installation
 
+# Enabling PLUMgrid plugin
+neutron_plugin_type: plumgrid
+
 # Repo Link hosting PLUMgrid packages
 plumgrid_repo: <Repo Link>
 plumgrid_component: fuji
