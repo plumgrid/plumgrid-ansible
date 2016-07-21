@@ -14,82 +14,64 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Remove sources file if exists
 - name: Removing pre-exiting sources.list
-  file: path=/etc/apt/sources.list.d/plumgrid.list state=absent
+  file:
+    path: "/etc/apt/sources.list.d/plumgrid.list"
+    state: absent
 
-# Create a PLUMgrid sources.list
-- name: Create PLUMgrid sources.list
-  lineinfile:
-    dest: /etc/apt/sources.list.d/plumgrid.list
-    line: "deb {{ plumgrid_repo }}/plumgrid plumgrid {{ plumgrid_component }}"
+- name: Add PLUMgrid and PLUMgrid-images repo
+  apt_repository:
+    repo: "{{ item }}"
     state: present
-    create: yes
+    filename: "plumgrid"
+  with_items:
+    - 'deb {{ plumgrid_repo }}/plumgrid plumgrid {{ plumgrid_component }}'
+    - 'deb {{ plumgrid_repo }}/plumgrid-images plumgrid {{ plumgrid_component }}'
 
-# Create a PLUMgrid sources.list
-- name: Add PLUMgrid-images to repo
-  lineinfile:
-    dest: /etc/apt/sources.list.d/plumgrid.list
-    line: "deb {{ plumgrid_repo }}/plumgrid-images plumgrid {{ plumgrid_component }}"
-    state: present
-
-# Copy GPG-key file to target nodes
 - name: Copy PLUMgrid GPG-key file
   template:
     src: "{{ gpg_keypath }}"
     dest: /tmp/GPG-KEY
 
-# Create GPG-key
 - name: Add PLUMgrid GPG-key
   apt_key:
     file: /tmp/GPG-KEY
     state: present
 
-# Update repositories
 - name: Running apt-update
   apt:
     update_cache: yes
 
-# Install package iovisor-dkms
-- name: Install iovisor
+- name: Install iovisor and plumgrid-lxc
   apt:
-    name: iovisor-dkms
+    name: "{{ item }}" 
+    update_cache: yes
     state: latest
     force: yes
+  with_items:
+    - iovisor-dkms
+    - plumgrid-lxc
 
-# Install package plumgrid-lxc
-- name: Install plumgrid-lxc
-  apt:
-    name: plumgrid-lxc
-    state: latest
-    force: yes
-
-# Set PLUMgrid config
 - name: Setup PLUMgrid Conf
   template:
-    src: plumgrid.conf
-    dest: /var/lib/libvirt/filesystems/plumgrid-data/conf/pg/plumgrid.conf
+    src: "plumgrid.conf.j2"
+    dest: "{{ plumgrid_data_dir }}/conf/pg/plumgrid.conf"
 
 - name: Override Management interface for node
   replace:
-    dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/plumgrid.conf"
+    dest: "{{ plumgrid_data_dir }}/conf/pg/plumgrid.conf"
     replace: "mgmt_dev={{ mgmt_override[inventory_hostname] }}"
     regexp: "mgmt_dev={{ pg_management }}"
   when: mgmt_override is defined and inventory_hostname in mgmt_override
 
-# Update hostname
-- name: Update PLUMgrid hostname
+- name: Update PLUMgrid hostname and hosts file
   replace:
-    dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/etc/hostname"
+    dest: "{{ plumgrid_data_dir }}/conf/etc/{{ item }}"
     replace: "{{ inventory_hostname }}"
     regexp: "plumgrid"
-
-# Update hosts
-- name: Update /etc/hosts
-  replace:
-    dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/etc/hosts"
-    replace: "{{ inventory_hostname }}"
-    regexp: "plumgrid"
+  with_items:
+    - hostname
+    - hosts
 
 - name: Get LCM key if present
   set_fact:
@@ -98,12 +80,11 @@
 
 - name: Set the LCM SSH key in place
   lineinfile:
-    dest: "/var/lib/libvirt/filesystems/plumgrid-data/root/.ssh/authorized_keys"
+    dest: "{{ plumgrid_data_dir }}/root/.ssh/authorized_keys"
     line: "{{ lcm_ssh_key }}"
     create: yes
   when: lcm_enabled is defined and lcm_enabled == True and lcm_ssh_key != ""
 
-# Removing network-manager
 - name: Removing network-manager
   apt:
     name: network-manager
@@ -112,15 +93,13 @@
     force: yes
 
 - name: Check if network-manager is still present
-  shell: >
-     dpkg -s network-manager | grep Status
+  shell: "dpkg -s network-manager | grep Status"
   register: nm_check
   failed_when: nm_check.stderr.find('is not installed') == -1
   changed_when: false
 
-# Copy config file for OPSVM
 - name: Drop OPSVM conf
   template:
-    src: "00-pg.conf"
-    dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/etc/00-pg.conf"
+    src: "00-pg.conf.j2"
+    dest: "{{ plumgrid_data_dir }}/conf/etc/00-pg.conf"
   when: middleware_ip is defined

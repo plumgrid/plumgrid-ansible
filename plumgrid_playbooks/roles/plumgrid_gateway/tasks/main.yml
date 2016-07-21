@@ -26,29 +26,30 @@
 
 - name: Run Gateway Interface Checks
   include: update_gateway.yml
-  when: ifcs_present.stat.exists == True
+  when: ifcs_present.stat.exists
   ignore_errors: true
 
-# Ensuring idempotency for ifcs file changes
 - name: Removing any pre-existing pg ifcs.conf
-  file: path=/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf state=absent
+  file:
+    path: "{{ plumgrid_data_dir }}/conf/pg/ifcs.conf"
+    state: absent
 
 - name: Create ifcs file
   lineinfile:
-    dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf"
+    dest: "{{ plumgrid_data_dir }}/conf/pg/ifcs.conf"
     line: "{{ fabric_interface }} = fabric_core host"
     create: yes
 
 - name: Override Fabric iterface for Gateway nodes
   replace:
-    dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf"
+    dest: "{{ plumgrid_data_dir }}/conf/pg/ifcs.conf"
     replace: "{{ fabric_ifc_override[inventory_hostname] }} = fabric_core host"
     regexp: "{{ fabric_interface }} = fabric_core host"
   when: fabric_ifc_override is defined and inventory_hostname in fabric_ifc_override
 
 - name: Add Gateway dev interfaces
   lineinfile:
-    dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/pg/ifcs.conf"
+    dest: "{{ plumgrid_data_dir }}/conf/pg/ifcs.conf"
     line: "{{ item.1 }} = access_phys"
   with_subelements:
       - gateway_hosts

@@ -18,6 +18,9 @@
 # The variables used by the PLUMgrid playbooks
 # Replace all < > placeholders with appropiate values before beginning an installation
 
+# PLUMgrid configuration directory path
+plumgrid_data_dir: "/var/lib/libvirt/filesystems/plumgrid-data"
+
 # Repo Link hosting PLUMgrid packages
 plumgrid_repo: <Repo Link>
 plumgrid_component: everest

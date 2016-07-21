@@ -16,6 +16,8 @@
 
 - hosts: neutron_all
   user: root
+    vars_files:
+     - /opt/openstack-ansible/playbooks/roles/os_neutron/defaults/main.yml
   tasks:
     - name: Ensure stopped neutron agent services
       service:
@@ -24,14 +26,12 @@
         pattern: "{{ item.value.service_name }}"
       register: service_stopped
       failed_when: "'msg' in service_stopped and 'FAIL' in service_stopped.msg|upper"
-      with_dict: neutron_services
-  vars_files:
-    - /opt/openstack-ansible/playbooks/roles/os_neutron/defaults/main.yml
+      with_dict: "{{ neutron_services }}"
 
 - hosts: neutron_server
   user: root
+  vars_files:
+    - /opt/openstack-ansible/playbooks/roles/os_neutron/defaults/main.yml
   roles:
    - role: "plumgrid_neutron"
      neutron_venv_tag: "{{ openstack_release }}"
-  vars_files:
-   - /opt/openstack-ansible/playbooks/roles/os_neutron/defaults/main.yml

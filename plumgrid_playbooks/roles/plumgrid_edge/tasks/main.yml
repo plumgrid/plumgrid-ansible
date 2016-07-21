@@ -21,11 +21,11 @@
     state: present
     create: yes
     owner: root
-    mode: "644"
+    mode: "0644"
 
 - name: Update qemu settings for compute hosts
   template:
-    src: qemu.conf
+    src: qemu.conf.j2
     dest: /etc/libvirt/qemu.conf
 
 - name: Restart libvirt-bin
