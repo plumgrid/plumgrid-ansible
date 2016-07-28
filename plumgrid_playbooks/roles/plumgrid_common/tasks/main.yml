@@ -138,7 +138,7 @@
 # Configure Analyst for OPSVM
 - name: Configure Analyst
   shell: >
-    /opt/local/bin/nsenter -t $(ps ho pid --ppid $(cat /var/run/libvirt/lxc/plumgrid.pid)) -m -n -u -i -p /usr/src/sigmund-configure --ip {{ middleware_ip }} --start --autoboot
+    /opt/local/bin/nsenter -t $(ps ho pid --ppid $(cat /var/run/libvirt/lxc/plumgrid.pid)) -m -n -u -i -p /usr/bin/sigmund-configure --ip {{ middleware_ip }} --start --autoboot
   ignore_errors: yes
 
 # Ensure Analyst service running
