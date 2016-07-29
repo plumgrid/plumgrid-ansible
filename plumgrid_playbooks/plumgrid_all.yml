@@ -15,7 +15,5 @@
 # limitations under the License.
 
 - include: plumgrid_preinstall_check.yml
-
 - include: plumgrid_neutron.yml
-
 - include: plumgrid_common.yml

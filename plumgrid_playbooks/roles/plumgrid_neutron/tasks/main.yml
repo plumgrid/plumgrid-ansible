@@ -14,50 +14,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Remove sources file if exists
 - name: Removing pre-exiting sources.list
-  file: path=/etc/apt/sources.list.d/plumgrid.list state=absent
+  file:
+    path: /etc/apt/sources.list.d/plumgrid.list
+    state: absent
 
-# Create a PLUMgrid sources.list
-- name: Create plumgrid sources.list
-  lineinfile:
-    dest: /etc/apt/sources.list.d/plumgrid.list
-    line: "deb {{ plumgrid_repo }}/plumgrid plumgrid {{ plumgrid_component }}"
+- name: Add PLUMgrid and PLUMgrid-images repo
+  apt_repository:
+    repo: "{{ item }}"
     state: present
-    create: yes
+    filename: "plumgrid"
+  with_items:
+    - 'deb {{ plumgrid_repo }}/plumgrid plumgrid {{ plumgrid_component }}'
+    - 'deb {{ plumgrid_repo }}/plumgrid-images plumgrid {{ plumgrid_component }}'
 
-# Point to valid PLUMgrid repo
-- name: Add plumgrid-images to repo
-  lineinfile:
-    dest: /etc/apt/sources.list.d/plumgrid.list
-    line: "deb {{ plumgrid_repo }}/plumgrid-images plumgrid {{ plumgrid_component }}"
-    state: present
-
-# Copy GPG-key file to target nodes
 - name: Copy Plumgrid GPG-key file
   template:
     src: "{{ gpg_keypath }}"
     dest: /tmp/GPG-KEY
 
-# Create GPG-key
 - name: Add Plumgrid GPG-key
   apt_key:
     file: /tmp/GPG-KEY
     state: present
 
-# Update repositories
 - name: Running apt-update
   apt:
     update_cache: yes
 
-# Install package plumgrid-pythonlib
 - name: Install plumgrid-pythonlib
   apt:
     name: plumgrid-pythonlib
     state: latest
     force: yes
 
-# Install plumgridlib on enabled venv
 - name: Install plumgridlib in neutron venv
   shell: |
      source {{ neutron_venv_bin }}/activate && python setup.py install
@@ -66,7 +56,6 @@
     chdir: /opt/pg/lib/python2.7/dist-packages/plumgrid-pythonlib
   when: neutron_venv_enabled | bool
 
-# Link plumgrid ini
 - name: Link plumgrid ini
   lineinfile:
     dest: "/etc/default/neutron-server"
@@ -75,7 +64,9 @@
     create: yes
 
 - name: Start neutron server
-  service: name=neutron-server state=started
+  service:
+    name: neutron-server
+    state: started
   register: service_started
   failed_when: "'msg' in service_started and 'FAIL' in service_started.msg|upper"
 

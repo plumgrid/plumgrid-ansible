@@ -16,16 +16,17 @@
 
 - hosts: shared-infra_hosts
   user: root
+
   roles:
     - plumgrid_common
     - create_ifcs
     - plumgrid_director
-  vars:
-    pg_service_name: plumgrid
   any_errors_fatal: yes
 
 - hosts: compute_hosts
   user: root
+  vars:
+    pg_service_name: plumgrid
   roles:
     - plumgrid_common
     - create_ifcs
@@ -35,12 +36,12 @@
 
 - hosts: gateway_hosts
   user: root
+  vars:
+    pg_service_name: plumgrid-iovisor
   roles:
     - plumgrid_common
     - create_ifcs
     - plumgrid_gateway
-  vars:
-    pg_service_name: plumgrid-iovisor
 
 - hosts: 127.0.0.1
   connection: local
@@ -50,6 +51,7 @@
         dest: /opt/openstack-ansible/playbooks/roles/os_nova/templates/nova.conf.j2
         regexp: '^metadata_host'
         replace: '#metadata_host'
+
     - name: Add neutron url timeouts to nova.conf
       lineinfile:
         dest: /opt/openstack-ansible/playbooks/roles/os_nova/templates/nova.conf.j2
@@ -57,6 +59,7 @@
         line: "url_timeout = 200"
         state: present
         create: yes
+        
     - name: Enable metadata play on Edges
       replace:
         dest: /opt/openstack-ansible/playbooks/roles/os_nova/tasks/nova_upstart_init.yml

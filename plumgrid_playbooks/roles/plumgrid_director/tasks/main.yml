@@ -14,21 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Extract License from file
 - name: Extract License
   set_fact:
     pg_license: "{{ lookup('file', pg_license_path) }}"
 
-# Modify template files
-- name: Setup Keepalived Config
+- name: Setup Keepalived and Nginx config
   template:
-    src: keepalived.conf
-    dest: /var/lib/libvirt/filesystems/plumgrid-data/conf/etc/keepalived.conf
-
-- name: Setup nginx Config
-  template:
-    src: default.conf
-    dest: /var/lib/libvirt/filesystems/plumgrid-data/conf/pg/nginx.conf
+    src: "{{ item.src }}"
+    dest: "{{ plumgrid_data_dir }}/{{ item.dest }}"
+  with_items:
+    - { src: 'keepalived.conf.j2', dest: 'conf/etc/keepalived.conf' }
+    - { src: 'default.conf.j2', dest: 'conf/pg/nginx.conf' }
 
 - name: Restart PLUMgrid service
   service:
@@ -38,7 +34,7 @@
 - name: Login to PLUMgrid
   shell: >
     curl -H "Accept: application/json" -H "Content-Type: application/json" -k -X POST https://{{ pg_vip }}/0/login -d '{"userName":"{{ pg_username }}","password":"{{ pg_password }}"}' -c /tmp/cookie -i | grep HTTP | awk '{print $2}'
-  when: install_license == True and inventory_hostname == groups['shared-infra_hosts'][0]
+  when: install_license == True and inventory_hostname == groups['director_hosts'][0]
   register: login_status
   until: login_status.stdout == '200'
   retries: 30
@@ -47,7 +43,7 @@
 - name: Install PLUMgrid License
   shell: >
     curl -H "Accept: application/json" -H "Content-Type: application/json" https://{{ pg_vip }}/0/tenant_manager/license_key/key1 -k -X PUT -d '{"license": "{{pg_license}}"}' -i -b /tmp/cookie -k| grep HTTP | awk '{print $2}'
-  when: install_license == True and inventory_hostname == groups['shared-infra_hosts'][0]
+  when: install_license == True and inventory_hostname == groups['director_hosts'][0]
   register: license_put_status
   until: license_put_status.stdout == '200'
   retries: 5
