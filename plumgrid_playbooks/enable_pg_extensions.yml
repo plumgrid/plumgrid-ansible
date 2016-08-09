@@ -1,6 +1,6 @@
 ---
 #
-# Copyright (c) 2015, PLUMgrid Inc, http://plumgrid.com
+# Copyright (c) 2016, PLUMgrid Inc, http://plumgrid.com
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,27 +17,34 @@
 - hosts: utility_all
   user: root
   tasks:
+    - name: Remove previous PLUMgrid sources.list
+      file:
+        path: /etc/apt/sources.list.d/plumgrid.list
+        state: absent
+
+    - name: Add PLUMgrid openstack to repo
+      lineinfile:
+        dest: /etc/apt/sources.list.d/plumgrid.list
+        line: "deb {{ plumgrid_repo }}/openstack/deb/{{ openstack_version }} openstack-{{ openstack_version }} {{ plumgrid_component }}"
+        state: present
+        create: yes
+
+    - name: Copy PLUMgrid GPG-key file
+      template:
+        src: "{{ gpg_keypath }}"
+        dest: /tmp/GPG-KEY
+
+    - name: Add Plumgrid GPG-key
+      apt_key:
+        file: /tmp/GPG-KEY
+        state: present
+
+    - name: Running apt-update
+      apt:
+        update_cache: yes
+
     - name: Install networking-plumgrid for utility targets
-      pip:
-        name: "{{ item }}"
-        state: present
-        extra_args: "{{ pip_install_options|default('') }}"
-      with_items: neutron_optional_plumgrid_pip_packages
-      register: install_packages
-      until: install_packages|success
-      ignore_errors: True
-      retries: 5
-      delay: 2
-    - name: Install networking-plumgrid fall back mode
-      pip:
-        name: "{{ item }}"
-        state: present
-        extra_args: "--isolated"
-      with_items: neutron_optional_plumgrid_pip_packages
-      when: install_packages|failed
-      register: install_packages_fall_back
-      until: install_packages_fall_back|success
-      retries: 5
-      delay: 2
-  vars_files:
-    - /etc/ansible/roles/os_neutron/defaults/main.yml
+      apt:
+        name: networking-plumgrid
+        state: latest
+        force: yes
