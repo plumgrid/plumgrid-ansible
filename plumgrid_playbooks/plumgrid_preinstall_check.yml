@@ -38,40 +38,6 @@
       copy:
         src: post_neutron_plumgrid.yml
         dest: /etc/ansible/roles/os_neutron/tasks/post_neutron_plumgrid.yml
-    - name: Download os-pg-version file from repo
-      get_url:
-        url: "{{ plumgrid_repo }}/files/pg_os_version.yaml"
-        dest: /tmp/pg_os_version.yaml
-        force: true
-    - name: Download lvm-installer
-      get_url:
-        url: "{{ plumgrid_repo }}/files/lvm-installer.sh"
-        dest: /tmp/lvm-installer.sh
-        force: true
-    - name: Extract PG version
-      shell: >
-        cat /tmp/lvm-installer.sh | grep pg_ver= | awk 'NR==1 {print}'| cut -c9-| sed 's/-.*//'
-      register: pg_ver
-    - name: Lookup networking-plumgrid version
-      shell: >
-        cat /tmp/pg_os_version.yaml | grep {{ pg_ver.stdout+'-m' }} | cut -d ' ' -f2
-      register: os_ver
-    - name: Remove pre-existing networking-plumgrid dict if exists
-      lineinfile:
-        dest: /etc/openstack_deploy/user_pg_vars.yml
-        line: "neutron_optional_plumgrid_pip_packages:"
-        state: absent
-    - name: Remove pre-existing networking-plumgrid version if exists
-      lineinfile:
-        dest: /etc/openstack_deploy/user_pg_vars.yml
-        regexp: ".- networking-plumgrid==."
-        state: absent
-    - name: Add networking-plumgrid version to vars
-      lineinfile:
-        dest: /etc/openstack_deploy/user_pg_vars.yml
-        line: "\nneutron_optional_plumgrid_pip_packages:\n  - networking-plumgrid=={{ os_ver.stdout }}"
-        insertafter: 'switch_password: plumgrid'
-        state: present
 
 - name: Check Kernel Version
   hosts: shared-infra_hosts:compute_hosts:gateway_hosts
