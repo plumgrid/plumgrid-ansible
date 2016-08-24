@@ -25,6 +25,16 @@
     src: keepalived.conf
     dest: /var/lib/libvirt/filesystems/plumgrid-data/conf/etc/keepalived.conf
 
+- name: Override Management interface in Keepalived for node
+  replace:
+    dest: "/var/lib/libvirt/filesystems/plumgrid-data/conf/etc/keepalived.conf"
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  with_items:
+    - { regexp: 'interface {{ pg_management }}', replace: 'interface {{ mgmt_override[inventory_hostname] }}' }
+    - { regexp: '{{ pg_vip }} dev {{ pg_management }} label {{ pg_management }}:1', replace: '{{ pg_vip }} dev {{ mgmt_override[inventory_hostname] }} label {{ mgmt_override[inventory_hostname] }}:1' }
+  when: mgmt_override is defined and inventory_hostname in mgmt_override
+
 - name: Setup nginx Config
   template:
     src: default.conf
