@@ -42,6 +42,11 @@
   vars:
     pg_service_name: plumgrid-iovisor
 
+- hosts: shared-infra_hosts:compute_hosts:gateway_hosts
+  user: root
+  roles:
+    - plumgrid_utility
+
 - hosts: 127.0.0.1
   connection: local
   tasks:

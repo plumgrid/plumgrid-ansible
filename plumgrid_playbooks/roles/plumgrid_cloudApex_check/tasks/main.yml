@@ -31,7 +31,7 @@
 
 - name: Check version of CloudApex
   shell: >
-    cat /var/lib/libvirt/filesystems/plumgrid/opt/pg/web/cloudApex/modules/appCloudApex/appCloudApex.js | grep -i appversion | awk '{print $2}'
+    /opt/local/bin/nsenter -t $(ps ho pid --ppid $(cat /var/run/libvirt/lxc/plumgrid.pid)) -m -n -u -i -p /usr/bin/dpkg -l | grep plumgrid-cloudapex | awk '{print $3}' | tr '-' ' ' | awk '{print $1}'
   when: ca_stats.stat.exists and (ca_stats.stat.isdir is defined and ca_stats.stat.isdir)
   register: ca_ver
 
