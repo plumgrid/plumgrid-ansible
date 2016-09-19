@@ -1,0 +1,76 @@
+---
+#
+# Copyright (c) 2016, PLUMgrid Inc, http://plumgrid.com
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- hosts: 127.0.0.1
+  connection: local
+  tasks:
+  - name: Include LBaaS in user variables file
+    lineinfile:
+      dest: /etc/openstack_deploy/user_variables.yml
+      state: present
+      line: "{{ item }}"
+    with_items:
+      - "neutron_plugin_base:"
+      - "  - neutron_lbaas.services.loadbalancer.plugin.LoadBalancerPlugin"
+  - name: Add PLUMgrid filters in LBaaS Haproxy filters file
+    lineinfile:
+      dest: /etc/ansible/roles/os_neutron/files/rootwrap.d/lbaas-haproxy.filters
+      state: present
+      line: "{{ item }}"
+    with_items:
+      - "ifc_ctl: CommandFilter, /opt/pg/bin/ifc_ctl, root, ifc_ctl"
+      - "ip: CommandFilter, ip, root, ip"
+  - name: Replace LBaaS interface driver with PLUMgrid LBaaS interface driver
+    lineinfile:
+      dest: /etc/ansible/roles/os_neutron/templates/lbaas_agent.ini.j2
+      backup: yes
+      state: present
+      regexp: "^interface_driver ="
+      insertafter: "^interface_driver ="
+      line: "interface_driver = plumgridlib.lbaas.interface_driver.PLUMgridInterfaceDriver"
+
+- hosts: network_hosts
+  user: root
+  tasks:
+    - name: Removing pre-exiting sources.list
+      file: path=/etc/apt/sources.list.d/plumgrid.list state=absent
+    - name: Create PLUMgrid sources.list
+      lineinfile:
+        dest: /etc/apt/sources.list.d/plumgrid.list
+        line: "deb {{ plumgrid_repo }}/plumgrid plumgrid {{ plumgrid_component }}"
+        state: present
+        create: yes
+    - name: Add PLUMgrid-images to repo
+      lineinfile:
+        dest: /etc/apt/sources.list.d/plumgrid.list
+        line: "deb {{ plumgrid_repo }}/plumgrid-images plumgrid {{ plumgrid_component }}"
+        state: present
+    - name: Copy PLUMgrid GPG-key file
+      template:
+        src: "{{ gpg_keypath }}"
+        dest: /tmp/GPG-KEY
+    - name: Add PLUMgrid GPG-key
+      apt_key:
+        file: /tmp/GPG-KEY
+        state: present
+    - name: Running apt-update
+      apt:
+        update_cache: yes
+    - name: Install plumgrid-pythonlib for LBaaS
+      apt:
+        name: plumgrid-pythonlib
+        state: latest
+        force: yes
