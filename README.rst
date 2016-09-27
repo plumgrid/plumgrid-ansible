@@ -27,7 +27,7 @@ This set of playbooks integrate with the openstack-ansible project to deploy the
 
 Follow the community installation guide for OSA PLUMgrid here for full installation steps:
 
- *http://docs.openstack.org/developer/openstack-ansible/install-guide/app-plumgrid.html*
+ *http://docs.openstack.org/developer/openstack-ansible/liberty/install-guide/app-plumgrid.html*
 
 Notes
 -------
