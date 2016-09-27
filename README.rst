@@ -24,9 +24,9 @@ Playbooks
 
 This set of playbooks integrate with the openstack-ansible project to deploy the PLUMgrid Controller and Compute components that help manage the PLUMgrid neutron plugin. The plugin itself must be enabled through the openstack-ansible neutron playbooks.
 
-Follow the community installation guide for OSA PLUMgrid here for full installation steps:
+Follow the community installation guide for OSA PLUMgrid here for full installation steps (navigate to current release Documentation > Appendices > Appendix: Using PLUMgrid Neutron plugin):
 
- *http://docs.openstack.org/developer/openstack-ansible/install-guide/app-plumgrid.html*
+ *http://docs.openstack.org/developer/openstack-ansible/*
 
 
 Notes
