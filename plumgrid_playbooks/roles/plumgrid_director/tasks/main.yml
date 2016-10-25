@@ -78,8 +78,8 @@
   when: inventory_hostname == groups['shared-infra_hosts'][0]
   register: license_status
   until: license_status.stdout == '200'
-  retries: 5
-  delay: 25
+  retries: 120
+  delay: 5
 
 - name: Remove license file
   file:
