@@ -14,6 +14,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Check if an upgrade and remove stale entries of previous install
+- name: Check if PLUMgrid plugin is installed
+  command: dpkg-query -l networking-plumgrid
+  register: deb_check
+  ignore_errors: yes
+
+- name: Register networking-plumgrid version
+  shell: >
+    dpkg -l | grep networking-plumgrid | awk '{print $3}'
+  register: np_ver
+  when: deb_check.rc == 0
+
+- name: Unlink previous networking-plumgrid files (venv)
+  shell: >
+    {{ item.state }} {{ item.name }}
+  with_items:
+    - { state: unlink, name: "{{ neutron_venv_lib_dir }}networking_plumgrid" }
+    - { state: unlink, name: "{{ neutron_venv_lib_dir }}networking_plumgrid-{{ np_ver.stdout }}-py2.7.egg-info" }
+  when:
+    - neutron_venv_enabled | bool
+    - deb_check.rc == 0
+  ignore_errors: yes
+
 # Remove sources file if exists
 - name: Removing pre-exiting sources.list
   file: path=/etc/apt/sources.list.d/plumgrid.list state=absent
