@@ -44,31 +44,14 @@
     set_fact:
       solutionVersion: "{{ openstack_release }}"
 
-  - name: Gather setup stats for rpc-release
-    stat: path=/etc/rpc-release
-    register: rpcr_stats
+  - name: Find solution name
+    shell: >
+      cat /etc/openstack-release | grep DISTRIB_ID | tr "=\"" " " | awk '{print $2}'
+    register: sol_name
 
-  - name: Gather setup stats for rpc-openstack
-    stat: path=/opt/rpc-openstack
-    register: rpcos_stats
-
-  - name: Gather setup stats for openstack-release
-    stat: path=/etc/openstack-release
-    register: osa_stats
-
-  - name: Check files ambiguity
-    debug: var=osa_stats
-    failed_when: osa_stats.stat.exists and rpcr_stats.stat.exists
-
-  - name: Get solution name
+  - name: Set solution name
     set_fact:
-      solutionName: "OpenStack Ansible"
-    when: osa_stats.stat.exists
-
-  - name: Get solution name
-    set_fact:
-      solutionName: "Rackspace Private Cloud"
-    when: rpcr_stats.stat.exists and (rpcos_stats.stat.isdir is defined and rpcos_stats.stat.isdir)
+      solutionName: "{{ sol_name.stdout.replace(' ','-') }}"
 
   - name: Download lvm-installer script
     get_url:
