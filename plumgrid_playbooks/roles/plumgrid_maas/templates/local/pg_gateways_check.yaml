@@ -1,0 +1,31 @@
+type        : agent.plugin
+label       : "plumgrid_gateways_check--{{ ansible_hostname }}"
+disabled    : false
+period      : 60
+timeout     : 30
+details     :
+    file    : check_pg_gws.sh
+    args    : ["{{ sapiServer }}", "{{ zone_name }}", "{{ sapiVersion }}"]
+alarms      :
+{% for host in groups['gateway_hosts'] %}
+    plumgrid_gateway_fabric_status--{{ host }} :
+        label                 : "plumgrid_gateway_fabric_status--{{ host }}"
+        notification_plan_id  : "{{ maas_notification_plan }}"
+        criteria              : |
+            :set consecutiveCount={{ pg_alarm_consecutive_count }}
+            if (metric["pg_gw_fabric_{{ host }}"] == "DOWN") {
+              return new AlarmStatus(CRITICAL, "PLUMgrid Gateway[{{ host }}]: fabric connectivity is down");
+            }
+              return new AlarmStatus(OK, "PLUMgrid Gateway[{{ host }}]: fabric connectivity is OK");
+{% endfor %}
+{% for host in groups['gateway_hosts'] %}
+    plumgrid_gateway_services_status--{{ host }} :
+        label                 : "plumgrid_gateway_services_status--{{ host }}"
+        notification_plan_id  : "{{ maas_notification_plan }}"
+        criteria              : |
+            :set consecutiveCount={{ pg_alarm_consecutive_count }}
+            if (metric["pg_gw_services_{{ host }}"] == "DOWN") {
+              return new AlarmStatus(CRITICAL, "PLUMgrid Gateway[{{ host }}]: services are down");
+            }
+              return new AlarmStatus(OK, "PLUMgrid Gateway[{{ host }}]: services are OK");
+{% endfor %}

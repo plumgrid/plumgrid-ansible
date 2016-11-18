@@ -1,0 +1,20 @@
+type        : agent.plugin
+label       : "plumgrid_directors_check--{{ ansible_hostname }}"
+disabled    : false
+period      : 60
+timeout     : 45
+details     :
+    file    : check_pg_directors.sh
+    args    : ["{{ sapiServer }}", "{{ zone_name }}", "{{ sapiVersion }}"]
+alarms      :
+{% for host in groups['shared-infra_hosts'] %}
+    plumgrid_director_status--{{ host }} :
+        label                 : "plumgrid_director_status--{{ host }}"
+        notification_plan_id  : "{{ maas_notification_plan }}"
+        criteria              : |
+            :set consecutiveCount={{ pg_alarm_consecutive_count }}
+            if (metric["status_pg_director_{{ host }}"] == "DOWN") {
+              return new AlarmStatus(CRITICAL, "PLUMgrid Director[{{ host }}] is down");
+            }
+              return new AlarmStatus(OK, "PLUMgrid Director[{{ host }}] is alive");
+{% endfor %}

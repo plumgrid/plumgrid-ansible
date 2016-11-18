@@ -1,0 +1,18 @@
+type        : agent.plugin
+label       : "plumgrid_rest_gateway_check--{{ ansible_hostname }}"
+disabled    : false
+period      : 60
+timeout     : 30
+details     :
+    file    : check_pg_rgw.sh
+    args    : ["{{ sapiServer }}", "{{ zone_name }}", "{{ sapiVersion }}"]
+alarms      :
+    plumgrid_rest_gateway_status :
+        label                 : "plumgrid_rest_gateway_status--{{ ansible_hostname }}"
+        notification_plan_id  : "{{ maas_notification_plan }}"
+        criteria              : |
+            :set consecutiveCount={{ pg_alarm_consecutive_count }}
+            if (metric["status_pg_rest_gateway"] == "DOWN") {
+              return new AlarmStatus(CRITICAL, "PLUMgrid REST gateway is down");
+            }
+              return new AlarmStatus(OK, "PLUMgrid REST gateway is up on Director[#{pg_rest_gateway_dir}]");

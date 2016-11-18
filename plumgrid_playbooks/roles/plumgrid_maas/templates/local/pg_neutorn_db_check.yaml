@@ -1,0 +1,18 @@
+type        : agent.plugin
+label       : "plumgrid_neutron_db_check--{{ ansible_hostname }}"
+disabled    : false
+period      : 60
+timeout     : 30
+details     :
+    file    : check_pg_neutron_db.sh
+    args    : ["{{ sapiServer }}", "{{ zone_name }}", "{{ sapiVersion }}"]
+alarms      :
+    plumgrid_neutron_db_status :
+        label                 : "plumgrid_neutron_db_status--{{ ansible_hostname }}"
+        notification_plan_id  : "{{ maas_notification_plan }}"
+        criteria              : |
+            :set consecutiveCount={{ pg_alarm_consecutive_count }}
+            if (metric["status_pg_neutron_db"] == "INCONSISTENT") {
+              return new AlarmStatus(CRITICAL, "PLUMgrid & Neutron DB are out of sync");
+            }
+              return new AlarmStatus(OK, "PLUMgrid & Neutron DB are consistent");

@@ -1,0 +1,17 @@
+type        : agent.plugin
+label       : "plumgrid_broker_service_check--{{ ansible_hostname }}"
+disabled    : false
+period      : 60
+timeout     : 30
+details     :
+    file    : check_pg_broker.sh
+alarms      :
+    plumgrid_broker_status :
+        label                 : "plumgrid_broker_status--{{ ansible_hostname }}"
+        notification_plan_id  : "{{ maas_notification_plan }}"
+        criteria              : |
+            :set consecutiveCount={{ pg_alarm_consecutive_count }}
+            if (metric["status_pg_broker"] == "DOWN") {
+              return new AlarmStatus(CRITICAL, "PLUMgrid Director[{{ ansible_hostname }}]: broker service is down");
+            }
+              return new AlarmStatus(OK, "PLUMgrid Director[{{ ansible_hostname }}]: broker service is running");
