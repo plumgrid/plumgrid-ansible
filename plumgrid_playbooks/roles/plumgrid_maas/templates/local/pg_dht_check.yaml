@@ -1,0 +1,29 @@
+type        : agent.plugin
+label       : "plumgrid_dht_check--{{ ansible_hostname }}"
+disabled    : false
+period      : 60
+timeout     : 45
+details     :
+    file    : check_pg_dht.sh
+    args    : ["{{ sapiServer }}", "{{ zone_name }}", "{{ sapiVersion }}"]
+alarms      :
+{% for host in groups['shared-infra_hosts'] %}
+    plumgrid_dht_status--{{ host }} :
+        label                 : "plumgrid_dht_status--{{ host }}"
+        notification_plan_id  : "{{ maas_notification_plan }}"
+        criteria              : |
+            :set consecutiveCount={{ pg_alarm_consecutive_count }}
+            if (metric["status_pg_dht_director_{{ host }}"] == "DOWN") {
+              return new AlarmStatus(CRITICAL, "PLUMgrid Director[{{ host }}]: DHT is down");
+            }
+              return new AlarmStatus(OK, "PLUMgrid Director[{{ host }}]: DHT is up");
+{% endfor %}
+    plumgrid_dht_ha_status--{{ ansible_hostname }} :
+        label                 : "plumgrid_dht_ha_status--{{ ansible_hostname }}"
+        notification_plan_id  : "{{ maas_notification_plan }}"
+        criteria              : |
+            :set consecutiveCount={{ pg_alarm_consecutive_count }}
+            if (metric["status_pg_dht_director_{{ groups['shared-infra_hosts'][0] }}"] != "UP" || metric["status_pg_dht_director_{{ groups['shared-infra_hosts'][1] }}"] != "UP" || metric["status_pg_dht_director_{{ groups['shared-infra_hosts'][2] }}"] != "UP") {
+              return new AlarmStatus(WARNING, "PLUMgrid DHT HA is down");
+            }
+            return new AlarmStatus(OK, "PLUMgrid is in Full DHT HA");

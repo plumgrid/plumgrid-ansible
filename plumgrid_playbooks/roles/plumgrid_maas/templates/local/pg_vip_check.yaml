@@ -1,0 +1,17 @@
+type        : agent.plugin
+label       : "plumgrid_vip_check--{{ ansible_hostname }}"
+disabled    : false
+period      : 60
+timeout     : 30
+details     :
+    file    : check_pg_vip.sh
+    args    : ["{{ sapiServer }}", "{{ zone_name }}", "{{ sapiVersion }}"]
+alarms      :
+    plumgrid_vip_status :
+        label                 : "plumgrid_vip_status--{{ ansible_hostname }}"
+        notification_plan_id  : "{{ maas_notification_plan }}"
+        criteria              : |
+          if (metric["status_pg_vip"] == "DOWN") {
+            return new AlarmStatus(CRITICAL, "PLUMgrid Virtual IP is down");
+          }
+            return new AlarmStatus(OK, "PLUMgrid Virtual IP is running on Director[#{pg_vip_dir}]");
