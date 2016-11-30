@@ -39,29 +39,9 @@
 
 # Remove sources file if exists
 - name: Removing pre-exiting sources.list
-  file: path=/etc/apt/sources.list.d/plumgrid.list state=absent
-
-# Create a PLUMgrid sources.list
-- name: Create plumgrid sources.list
-  lineinfile:
-    dest: /etc/apt/sources.list.d/plumgrid.list
-    line: "deb {{ plumgrid_repo }}/plumgrid plumgrid {{ plumgrid_component }}"
-    state: present
-    create: yes
-
-# Point to valid PLUMgrid repo
-- name: Add plumgrid-images to repo
-  lineinfile:
-    dest: /etc/apt/sources.list.d/plumgrid.list
-    line: "deb {{ plumgrid_repo }}/plumgrid-images plumgrid {{ plumgrid_component }}"
-    state: present
-
-# Add PLUMgrid openstack to repo
-- name: Add PLUMgrid openstack to repo
-  lineinfile:
-    dest: /etc/apt/sources.list.d/plumgrid.list
-    line: "deb {{ plumgrid_repo }}/openstack/deb/{{ openstack_version }} openstack-{{ openstack_version }} {{ plumgrid_component }}"
-    state: present
+  file:
+    path: /etc/apt/sources.list.d/plumgrid.list
+    state: absent
 
 # Copy GPG-key file to target nodes
 - name: Copy Plumgrid GPG-key file
@@ -75,10 +55,15 @@
     file: /tmp/GPG-KEY
     state: present
 
-# Update repositories
-- name: Running apt-update
-  apt:
-    update_cache: yes
+- name: Create PLUMgrid sources.list
+  apt_repository:
+    repo: "{{ item }}"
+    filename: plumgrid
+    state: present
+  with_items:
+    - "deb {{ plumgrid_repo }}/plumgrid plumgrid {{ plumgrid_component }}"
+    - "deb {{ plumgrid_repo }}/plumgrid-images plumgrid {{ plumgrid_component }}"
+    - "deb {{ plumgrid_repo }}/openstack/deb/{{ openstack_version }} openstack-{{ openstack_version }} {{ plumgrid_component }}"
 
 # Install package plumgrid-pythonlib
 - name: Install plumgrid-pythonlib

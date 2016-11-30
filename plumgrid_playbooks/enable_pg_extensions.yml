@@ -19,15 +19,8 @@
   tasks:
     - name: Remove previous PLUMgrid sources.list
       file:
-        path: /etc/apt/sources.list.d/plumgrid.list
+        path: "/etc/apt/sources.list.d/plumgrid.list"
         state: absent
-
-    - name: Add PLUMgrid openstack to repo
-      lineinfile:
-        dest: /etc/apt/sources.list.d/plumgrid.list
-        line: "deb {{ plumgrid_repo }}/openstack/deb/{{ openstack_version }} openstack-{{ openstack_version }} {{ plumgrid_component }}"
-        state: present
-        create: yes
 
     - name: Copy PLUMgrid GPG-key file
       template:
@@ -39,12 +32,15 @@
         file: /tmp/GPG-KEY
         state: present
 
-    - name: Running apt-update
-      apt:
-        update_cache: yes
+    - name: Add PLUMgrid openstack to repo
+      apt_repository:
+        repo: "deb {{ plumgrid_repo }}/openstack/deb/{{ openstack_version }} openstack-{{ openstack_version }} {{ plumgrid_component }}"
+        filename: plumgrid
+        state: present
 
     - name: Install networking-plumgrid for utility targets
       apt:
         name: networking-plumgrid
+        update_cache: yes
         state: latest
         force: yes
